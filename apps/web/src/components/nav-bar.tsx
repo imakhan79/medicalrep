@@ -8,6 +8,7 @@ const links = [
   { href: "/", label: "Dashboard" },
   { href: "/hcps", label: "HCPs" },
   { href: "/visits", label: "Visits" },
+  { href: "/admin/roles", label: "Roles & Permissions" },
 ]
 
 export function NavBar() {

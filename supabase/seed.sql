@@ -248,6 +248,9 @@ insert into auth.users (
    '{"provider":"email","providers":["email"]}', '{}'),
   ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-0000000000a2', 'authenticated', 'authenticated',
    'manager1@medicalrep.dev', crypt('DevPassword123!', gen_salt('bf')), now(), now(), now(), '', '', '', '',
+   '{"provider":"email","providers":["email"]}', '{}'),
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-0000000000a3', 'authenticated', 'authenticated',
+   'admin1@medicalrep.dev', crypt('DevPassword123!', gen_salt('bf')), now(), now(), now(), '', '', '', '',
    '{"provider":"email","providers":["email"]}', '{}')
 on conflict (id) do nothing;
 
@@ -255,7 +258,9 @@ insert into auth.identities (id, provider_id, user_id, identity_data, provider, 
   ('00000000-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-0000000000a1',
    '{"sub":"00000000-0000-0000-0000-0000000000a1","email":"rep1@medicalrep.dev"}', 'email', now(), now(), now()),
   ('00000000-0000-0000-0000-0000000000a2', '00000000-0000-0000-0000-0000000000a2', '00000000-0000-0000-0000-0000000000a2',
-   '{"sub":"00000000-0000-0000-0000-0000000000a2","email":"manager1@medicalrep.dev"}', 'email', now(), now(), now())
+   '{"sub":"00000000-0000-0000-0000-0000000000a2","email":"manager1@medicalrep.dev"}', 'email', now(), now(), now()),
+  ('00000000-0000-0000-0000-0000000000a3', '00000000-0000-0000-0000-0000000000a3', '00000000-0000-0000-0000-0000000000a3',
+   '{"sub":"00000000-0000-0000-0000-0000000000a3","email":"admin1@medicalrep.dev"}', 'email', now(), now(), now())
 on conflict (provider_id, provider) do nothing;
 
 insert into public.organizations (id, name) values
@@ -286,6 +291,11 @@ on conflict (user_id, organization_id) do update set role_id = excluded.role_id;
 insert into public.memberships (organization_id, user_id, role_id)
 select '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-0000000000a2', id
 from public.roles where key = 'regional_manager' and organization_id is null
+on conflict (user_id, organization_id) do update set role_id = excluded.role_id;
+
+insert into public.memberships (organization_id, user_id, role_id)
+select '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-0000000000a3', id
+from public.roles where key = 'company_admin' and organization_id is null
 on conflict (user_id, organization_id) do update set role_id = excluded.role_id;
 
 insert into public.territory_assignments (organization_id, territory_id, user_id) values
