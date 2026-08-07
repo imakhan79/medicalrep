@@ -368,3 +368,161 @@ on conflict (id) do nothing;
 insert into public.order_items (id, order_id, product_id, quantity, unit_price) values
   ('00000000-0000-0000-0000-000000000082', '00000000-0000-0000-0000-000000000081', '00000000-0000-0000-0000-000000000040', 100, 12.50)
 on conflict (id) do nothing;
+
+-- ══════════════════════════════════════════════════════════════════════════
+-- Fuller demo dataset: a 2nd territory + 2 more reps, more master data, and a
+-- realistic spread of activity so every module (and the analytics/AI RPCs)
+-- has something real to show, including deliberate outliers for the anomaly
+-- detector to actually flag.
+-- ══════════════════════════════════════════════════════════════════════════
+
+insert into public.territories (id, organization_id, name) values
+  ('00000000-0000-0000-0000-000000000011', '00000000-0000-0000-0000-000000000001', 'South Zone')
+on conflict (id) do nothing;
+
+insert into auth.users (
+  instance_id, id, aud, role, email, encrypted_password,
+  email_confirmed_at, created_at, updated_at,
+  confirmation_token, recovery_token, email_change_token_new, email_change,
+  raw_app_meta_data, raw_user_meta_data
+) values
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-0000000000a4', 'authenticated', 'authenticated',
+   'rep2@medicalrep.dev', crypt('DevPassword123!', gen_salt('bf')), now(), now(), now(), '', '', '', '',
+   '{"provider":"email","providers":["email"]}', '{}'),
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-0000000000a5', 'authenticated', 'authenticated',
+   'rep3@medicalrep.dev', crypt('DevPassword123!', gen_salt('bf')), now(), now(), now(), '', '', '', '',
+   '{"provider":"email","providers":["email"]}', '{}')
+on conflict (id) do nothing;
+
+insert into auth.identities (id, provider_id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at) values
+  ('00000000-0000-0000-0000-0000000000a4', '00000000-0000-0000-0000-0000000000a4', '00000000-0000-0000-0000-0000000000a4',
+   '{"sub":"00000000-0000-0000-0000-0000000000a4","email":"rep2@medicalrep.dev"}', 'email', now(), now(), now()),
+  ('00000000-0000-0000-0000-0000000000a5', '00000000-0000-0000-0000-0000000000a5', '00000000-0000-0000-0000-0000000000a5',
+   '{"sub":"00000000-0000-0000-0000-0000000000a5","email":"rep3@medicalrep.dev"}', 'email', now(), now(), now())
+on conflict (provider_id, provider) do nothing;
+
+insert into public.memberships (organization_id, user_id, role_id)
+select '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-0000000000a4', id
+from public.roles where key = 'medical_representative' and organization_id is null
+on conflict (user_id, organization_id) do update set role_id = excluded.role_id;
+
+insert into public.memberships (organization_id, user_id, role_id)
+select '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-0000000000a5', id
+from public.roles where key = 'medical_representative' and organization_id is null
+on conflict (user_id, organization_id) do update set role_id = excluded.role_id;
+
+insert into public.territory_assignments (organization_id, territory_id, user_id) values
+  ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000011', '00000000-0000-0000-0000-0000000000a4'),
+  ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-0000000000a5')
+on conflict (territory_id, user_id) do nothing;
+
+insert into public.hcos (id, organization_id, name, type, territory_id) values
+  ('00000000-0000-0000-0000-000000000021', '00000000-0000-0000-0000-000000000001', 'Riverside Clinic', 'clinic', '00000000-0000-0000-0000-000000000010'),
+  ('00000000-0000-0000-0000-000000000022', '00000000-0000-0000-0000-000000000001', 'Southside Medical Center', 'hospital', '00000000-0000-0000-0000-000000000011')
+on conflict (id) do nothing;
+
+insert into public.hcps (id, organization_id, first_name, last_name, specialty, tier, hco_id, territory_id, consent_status) values
+  ('00000000-0000-0000-0000-000000000031', '00000000-0000-0000-0000-000000000001', 'Bilal', 'Ahmed', 'Neurology', 'B', '00000000-0000-0000-0000-000000000021', '00000000-0000-0000-0000-000000000010', 'granted'),
+  ('00000000-0000-0000-0000-000000000032', '00000000-0000-0000-0000-000000000001', 'Sara', 'Malik', 'Pediatrics', 'C', '00000000-0000-0000-0000-000000000020', '00000000-0000-0000-0000-000000000010', 'pending'),
+  ('00000000-0000-0000-0000-000000000033', '00000000-0000-0000-0000-000000000001', 'Omar', 'Farooq', 'Cardiology', 'A', '00000000-0000-0000-0000-000000000022', '00000000-0000-0000-0000-000000000011', 'granted'),
+  ('00000000-0000-0000-0000-000000000034', '00000000-0000-0000-0000-000000000001', 'Nadia', 'Sheikh', 'Dermatology', 'B', '00000000-0000-0000-0000-000000000022', '00000000-0000-0000-0000-000000000011', 'granted')
+on conflict (id) do nothing;
+
+insert into public.products (id, organization_id, name, sku) values
+  ('00000000-0000-0000-0000-000000000041', '00000000-0000-0000-0000-000000000001', 'NeuroCalm 20mg', 'NC-020'),
+  ('00000000-0000-0000-0000-000000000042', '00000000-0000-0000-0000-000000000001', 'PediaVite Syrup', 'PV-100')
+on conflict (id) do nothing;
+
+-- Visits: a realistic recency spread (today down to 45 days ago) across 3 reps,
+-- so next_best_actions has real gaps to surface (Sara Malik: overdue + pending consent).
+insert into public.visits (id, organization_id, hcp_id, rep_id, visited_at, objective) values
+  ('00000000-0000-0000-0000-000000000090', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000031', '00000000-0000-0000-0000-0000000000a1', now() - interval '3 days', 'Detailing NeuroCalm'),
+  ('00000000-0000-0000-0000-000000000091', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000032', '00000000-0000-0000-0000-0000000000a1', now() - interval '45 days', 'Routine call'),
+  ('00000000-0000-0000-0000-000000000092', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000030', '00000000-0000-0000-0000-0000000000a5', now() - interval '10 days', 'Follow-up'),
+  ('00000000-0000-0000-0000-000000000093', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000031', '00000000-0000-0000-0000-0000000000a5', now() - interval '2 days', 'Sample drop'),
+  ('00000000-0000-0000-0000-000000000094', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000033', '00000000-0000-0000-0000-0000000000a4', now() - interval '1 days', 'Intro call'),
+  ('00000000-0000-0000-0000-000000000095', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000034', '00000000-0000-0000-0000-0000000000a4', now() - interval '20 days', 'Dermatology detailing'),
+  ('00000000-0000-0000-0000-000000000096', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000033', '00000000-0000-0000-0000-0000000000a4', now(), 'Follow-up'),
+  ('00000000-0000-0000-0000-000000000097', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000030', '00000000-0000-0000-0000-0000000000a1', now() - interval '6 days', 'Sample drop'),
+  ('00000000-0000-0000-0000-000000000098', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000030', '00000000-0000-0000-0000-0000000000a1', now() - interval '3 days', 'Sample drop'),
+  ('00000000-0000-0000-0000-000000000099', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000030', '00000000-0000-0000-0000-0000000000a5', now() - interval '4 days', 'Sample drop'),
+  ('00000000-0000-0000-0000-00000000009a', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000031', '00000000-0000-0000-0000-0000000000a5', now() - interval '5 days', 'Sample drop'),
+  ('00000000-0000-0000-0000-00000000009b', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000030', '00000000-0000-0000-0000-0000000000a5', now() - interval '1 days', 'Sample drop'),
+  ('00000000-0000-0000-0000-00000000009c', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000033', '00000000-0000-0000-0000-0000000000a4', now() - interval '2 days', 'Sample drop'),
+  ('00000000-0000-0000-0000-00000000009d', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000034', '00000000-0000-0000-0000-0000000000a4', now() - interval '6 days', 'Sample drop'),
+  ('00000000-0000-0000-0000-00000000009e', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000033', '00000000-0000-0000-0000-0000000000a4', now() - interval '4 days', 'Sample drop')
+on conflict (id) do nothing;
+
+-- Sample allocations: enough headroom for the distributions below.
+insert into public.sample_allocations (id, organization_id, rep_id, product_id, period_month, allocated_qty, notes) values
+  ('00000000-0000-0000-0000-000000000061', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-0000000000a5', '00000000-0000-0000-0000-000000000040', date_trunc('month', current_date)::date, 20, 'Monthly allocation'),
+  ('00000000-0000-0000-0000-000000000062', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-0000000000a4', '00000000-0000-0000-0000-000000000040', date_trunc('month', current_date)::date, 100, 'Monthly allocation')
+on conflict (id) do nothing;
+
+-- Distributions calibrated so sample_distribution_anomalies actually fires: rep1 and
+-- rep3 give CardioMax conservatively (avg ~2-3/visit), rep2 gives it far more heavily
+-- (avg ~21/visit) — well over 2x the resulting org-wide average.
+insert into public.visit_products (id, visit_id, product_id, sample_qty) values
+  ('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-000000000097', '00000000-0000-0000-0000-000000000040', 2),
+  ('00000000-0000-0000-0000-0000000000b2', '00000000-0000-0000-0000-000000000098', '00000000-0000-0000-0000-000000000040', 2),
+  ('00000000-0000-0000-0000-0000000000b3', '00000000-0000-0000-0000-000000000099', '00000000-0000-0000-0000-000000000040', 2),
+  ('00000000-0000-0000-0000-0000000000b4', '00000000-0000-0000-0000-00000000009a', '00000000-0000-0000-0000-000000000040', 3),
+  ('00000000-0000-0000-0000-0000000000b5', '00000000-0000-0000-0000-00000000009b', '00000000-0000-0000-0000-000000000040', 2),
+  ('00000000-0000-0000-0000-0000000000b6', '00000000-0000-0000-0000-00000000009c', '00000000-0000-0000-0000-000000000040', 20),
+  ('00000000-0000-0000-0000-0000000000b7', '00000000-0000-0000-0000-00000000009d', '00000000-0000-0000-0000-000000000040', 22),
+  ('00000000-0000-0000-0000-0000000000b8', '00000000-0000-0000-0000-00000000009e', '00000000-0000-0000-0000-000000000040', 21)
+on conflict (id) do nothing;
+
+-- Targets for the new reps.
+insert into public.targets (id, organization_id, rep_id, metric_type, period_month, target_value, notes) values
+  ('00000000-0000-0000-0000-000000000071', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-0000000000a4', 'visit_count', date_trunc('month', current_date)::date, 12, 'Monthly visit frequency target'),
+  ('00000000-0000-0000-0000-000000000072', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-0000000000a5', 'visit_count', date_trunc('month', current_date)::date, 18, 'Monthly visit frequency target')
+on conflict (id) do nothing;
+
+-- Tour plans: one more draft, one more submitted, for pipeline variety.
+insert into public.tour_plans (id, organization_id, rep_id, territory_id, title, period_start, period_end, notes, status) values
+  ('00000000-0000-0000-0000-000000000054', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-0000000000a4', '00000000-0000-0000-0000-000000000011', 'South Zone — Week 33', current_date, current_date + 4, 'Cover Southside accounts', 'draft'),
+  ('00000000-0000-0000-0000-000000000055', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-0000000000a5', '00000000-0000-0000-0000-000000000010', 'North Zone — Week 33', current_date, current_date + 4, 'Cover Riverside + City General', 'submitted')
+on conflict (id) do nothing;
+
+insert into public.tour_plan_visits (id, tour_plan_id, hcp_id, planned_date, notes) values
+  ('00000000-0000-0000-0000-000000000056', '00000000-0000-0000-0000-000000000054', '00000000-0000-0000-0000-000000000033', current_date + 1, 'Intro visit'),
+  ('00000000-0000-0000-0000-000000000057', '00000000-0000-0000-0000-000000000055', '00000000-0000-0000-0000-000000000031', current_date + 2, 'Follow-up')
+on conflict (id) do nothing;
+
+-- Expense claims: real history per rep/category, plus two deliberate outliers so
+-- expense_anomalies has something genuine to flag (each >2x that rep's own average
+-- for the same category, excluding itself, with 4 prior claims backing the average).
+insert into public.expense_claims (id, organization_id, rep_id, category, amount, expense_date, description, status) values
+  ('00000000-0000-0000-0000-0000000000c1', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-0000000000a1', 'travel', 60, current_date - 20, 'Client visit mileage', 'approved'),
+  ('00000000-0000-0000-0000-0000000000c2', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-0000000000a1', 'travel', 55, current_date - 15, 'Client visit mileage', 'approved'),
+  ('00000000-0000-0000-0000-0000000000c3', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-0000000000a1', 'travel', 65, current_date - 10, 'Client visit mileage', 'approved'),
+  ('00000000-0000-0000-0000-0000000000c4', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-0000000000a1', 'travel', 58, current_date - 5, 'Client visit mileage', 'submitted'),
+  ('00000000-0000-0000-0000-0000000000c5', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-0000000000a1', 'travel', 280, current_date - 1, 'Regional conference travel', 'submitted'),
+  ('00000000-0000-0000-0000-0000000000c6', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-0000000000a1', 'meals', 25, current_date - 14, 'Client lunch', 'approved'),
+  ('00000000-0000-0000-0000-0000000000c7', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-0000000000a1', 'meals', 30, current_date - 7, 'Client lunch', 'approved'),
+  ('00000000-0000-0000-0000-0000000000c8', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-0000000000a4', 'travel', 40, current_date - 12, 'Territory travel', 'approved'),
+  ('00000000-0000-0000-0000-0000000000c9', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-0000000000a4', 'travel', 45, current_date - 6, 'Territory travel', 'approved'),
+  ('00000000-0000-0000-0000-0000000000ca', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-0000000000a4', 'travel', 42, current_date - 2, 'Territory travel', 'submitted'),
+  ('00000000-0000-0000-0000-0000000000cb', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-0000000000a5', 'accommodation', 100, current_date - 25, 'Overnight territory trip', 'approved'),
+  ('00000000-0000-0000-0000-0000000000cc', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-0000000000a5', 'accommodation', 110, current_date - 18, 'Overnight territory trip', 'approved'),
+  ('00000000-0000-0000-0000-0000000000cd', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-0000000000a5', 'accommodation', 95, current_date - 9, 'Overnight territory trip', 'approved'),
+  ('00000000-0000-0000-0000-0000000000ce', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-0000000000a5', 'accommodation', 105, current_date - 4, 'Overnight territory trip', 'submitted'),
+  ('00000000-0000-0000-0000-0000000000cf', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-0000000000a5', 'accommodation', 500, current_date - 1, 'Extended stay, regional summit', 'submitted')
+on conflict (id) do nothing;
+
+-- Channel partners + orders: full lifecycle variety.
+insert into public.channel_partners (id, organization_id, name, type, territory_id, contact_phone) values
+  ('00000000-0000-0000-0000-000000000083', '00000000-0000-0000-0000-000000000001', 'City Central Stockist', 'stockist', '00000000-0000-0000-0000-000000000010', '+1-555-0101'),
+  ('00000000-0000-0000-0000-000000000084', '00000000-0000-0000-0000-000000000001', 'Southside Pharmacy Group', 'pharmacy', '00000000-0000-0000-0000-000000000011', '+1-555-0102')
+on conflict (id) do nothing;
+
+insert into public.orders (id, organization_id, channel_partner_id, placed_by, status, fulfillment_status) values
+  ('00000000-0000-0000-0000-000000000085', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000083', '00000000-0000-0000-0000-0000000000a3', 'submitted', 'pending'),
+  ('00000000-0000-0000-0000-000000000086', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000084', '00000000-0000-0000-0000-0000000000a3', 'approved', 'delivered')
+on conflict (id) do nothing;
+
+insert into public.order_items (id, order_id, product_id, quantity, unit_price) values
+  ('00000000-0000-0000-0000-000000000087', '00000000-0000-0000-0000-000000000085', '00000000-0000-0000-0000-000000000041', 50, 18.00),
+  ('00000000-0000-0000-0000-000000000088', '00000000-0000-0000-0000-000000000086', '00000000-0000-0000-0000-000000000042', 200, 6.25)
+on conflict (id) do nothing;
