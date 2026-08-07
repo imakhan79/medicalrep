@@ -6,6 +6,7 @@ import { TrackingControls } from "./tracking-controls"
 import { LiveMap } from "./live-map"
 import { AlertActions } from "./alert-actions"
 import { SosActions } from "./sos-actions"
+import { RealtimeRefresh } from "./realtime-refresh"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default async function FieldTrackingPage() {
@@ -44,6 +45,7 @@ export default async function FieldTrackingPage() {
 
   return (
     <div className="space-y-6">
+      <RealtimeRefresh tables={["tracking_alerts", "sos_incidents"]} />
       <PageHeader
         icon={Radar}
         title="Field Force Live Tracking"
