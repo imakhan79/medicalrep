@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
+import { BackLink } from "@/components/back-link"
 import { VisitPlanner } from "./visit-planner"
 import { StatusActions } from "./status-actions"
 
@@ -56,6 +57,7 @@ export default async function TourPlanDetailPage(props: PageProps<"/tour-plans/[
 
   return (
     <div className="space-y-6">
+      <BackLink href="/tour-plans" label="Back to tour plans" />
       <div>
         <div className="flex items-center gap-3">
           <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">{plan.title}</h1>

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { getCurrentOrgId } from "@/lib/org"
+import { BackLink } from "@/components/back-link"
 import { PermissionMatrix } from "./permission-matrix"
 
 export default async function RoleDetailPage(props: PageProps<"/admin/roles/[roleId]">) {
@@ -36,6 +37,7 @@ export default async function RoleDetailPage(props: PageProps<"/admin/roles/[rol
 
   return (
     <div className="space-y-6">
+      <BackLink href="/admin/roles" label="Back to roles" />
       <div>
         <div className="flex items-center gap-3">
           <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">{role.name}</h1>

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
+import { BackLink } from "@/components/back-link"
 import { StatusActions } from "./status-actions"
 
 const STATUS_STYLES: Record<string, string> = {
@@ -61,6 +62,7 @@ export default async function ExpenseClaimDetailPage(props: PageProps<"/expense-
 
   return (
     <div className="space-y-6">
+      <BackLink href="/expense-claims" label="Back to expense claims" />
       <div>
         <div className="flex items-center gap-3">
           <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight capitalize">

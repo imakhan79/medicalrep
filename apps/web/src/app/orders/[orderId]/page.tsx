@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
+import { BackLink } from "@/components/back-link"
 import { ItemEditor } from "./item-editor"
 import { StatusActions } from "./status-actions"
 
@@ -63,6 +64,7 @@ export default async function OrderDetailPage(props: PageProps<"/orders/[orderId
 
   return (
     <div className="space-y-6">
+      <BackLink href="/orders" label="Back to orders" />
       <div>
         <div className="flex items-center gap-3">
           <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">
