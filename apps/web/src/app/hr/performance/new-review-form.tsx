@@ -92,7 +92,7 @@ export function NewReviewForm({ orgId, members }: { orgId: string; members: Memb
             <Label htmlFor="review-improvements">Areas to improve</Label>
             <Input id="review-improvements" value={improvements} onChange={(e) => setImprovements(e.target.value)} />
           </div>
-          <Button type="submit" disabled={submitting} className="sm:w-fit">
+          <Button type="submit" disabled={submitting || !repId} className="sm:w-fit">
             {submitting ? "Saving…" : "Submit review"}
           </Button>
         </form>

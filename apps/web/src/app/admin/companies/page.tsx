@@ -4,9 +4,15 @@ import { PageHeader } from "@/components/page-header"
 import { NewCompanyForm } from "./new-company-form"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
+const LIST_LIMIT = 200
+
 export default async function CompaniesPage() {
   const supabase = await createClient()
-  const { data: orgs, error } = await supabase.from("organizations").select("id, name, created_at").order("created_at")
+  const { data: orgs, error } = await supabase
+    .from("organizations")
+    .select("id, name, created_at")
+    .order("created_at")
+    .limit(LIST_LIMIT)
 
   return (
     <div className="space-y-6">
@@ -40,6 +46,11 @@ export default async function CompaniesPage() {
             ))}
             {orgs?.length === 0 && <li className="p-3 text-muted-foreground">No companies visible.</li>}
           </ul>
+          {orgs && orgs.length === LIST_LIMIT && (
+            <p className="text-xs text-muted-foreground mt-2">
+              Showing the most recent {LIST_LIMIT}. Search and pagination are coming soon.
+            </p>
+          )}
         </CardContent>
       </Card>
     </div>

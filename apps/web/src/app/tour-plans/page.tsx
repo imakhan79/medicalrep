@@ -13,6 +13,8 @@ const STATUS_STYLES: Record<string, string> = {
   rejected: "bg-destructive-soft text-destructive",
 }
 
+const LIST_LIMIT = 200
+
 export default async function TourPlansPage() {
   const supabase = await createClient()
 
@@ -22,6 +24,7 @@ export default async function TourPlansPage() {
     .from("tour_plans")
     .select("id, title, period_start, period_end, status, rep_id, territory_id")
     .order("created_at", { ascending: false })
+    .limit(LIST_LIMIT)
 
   return (
     <div className="space-y-6">
@@ -66,6 +69,11 @@ export default async function TourPlansPage() {
               <li className="p-3 text-sm text-muted-foreground">No tour plans yet.</li>
             )}
           </ul>
+          {plans && plans.length === LIST_LIMIT && (
+            <p className="text-xs text-muted-foreground mt-2">
+              Showing the most recent {LIST_LIMIT}. Search and pagination are coming soon.
+            </p>
+          )}
         </CardContent>
       </Card>
     </div>

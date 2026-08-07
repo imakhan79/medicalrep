@@ -154,6 +154,7 @@ export function NavBar() {
               </span>
               <button
                 onClick={handleSignOut}
+                aria-label="Sign out"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-medium text-foreground/70 hover:bg-muted hover:text-foreground transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
               >
                 <LogOut className="size-4" aria-hidden />

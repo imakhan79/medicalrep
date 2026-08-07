@@ -14,6 +14,8 @@ const STATUS_STYLES: Record<string, string> = {
   rejected: "bg-destructive-soft text-destructive",
 }
 
+const LIST_LIMIT = 200
+
 export default async function LeavePage() {
   const supabase = await createClient()
   const orgId = await getCurrentOrgId(supabase)
@@ -27,6 +29,30 @@ export default async function LeavePage() {
     .from("leave_requests")
     .select("id, rep_id, territory_id, leave_type, start_date, end_date, reason, status, decision_notes")
     .order("created_at", { ascending: false })
+    .limit(LIST_LIMIT)
+
+  const territoryIds = Array.from(new Set((requests ?? []).map((r) => r.territory_id)))
+  const permissionsByTerritory = new Map(
+    await Promise.all(
+      territoryIds.map(async (territoryId) => {
+        const [{ data: canApprove }, { data: canReject }] = await Promise.all([
+          supabase.rpc("can_access_row", {
+            p_org_id: orgId,
+            p_resource_key: "leave_requests",
+            p_action: "approve",
+            p_territory_id: territoryId,
+          }),
+          supabase.rpc("can_access_row", {
+            p_org_id: orgId,
+            p_resource_key: "leave_requests",
+            p_action: "reject",
+            p_territory_id: territoryId,
+          }),
+        ])
+        return [territoryId, { canApprove: Boolean(canApprove), canReject: Boolean(canReject) }] as const
+      })
+    )
+  )
 
   return (
     <div className="space-y-6">
@@ -66,15 +92,20 @@ export default async function LeavePage() {
                 </div>
                 <LeaveActions
                   leaveId={r.id}
-                  organizationId={orgId}
-                  territoryId={r.territory_id}
                   status={r.status}
                   isOwner={user?.id === r.rep_id}
+                  canApprove={permissionsByTerritory.get(r.territory_id)?.canApprove ?? false}
+                  canReject={permissionsByTerritory.get(r.territory_id)?.canReject ?? false}
                 />
               </li>
             ))}
             {requests?.length === 0 && <li className="p-3 text-sm text-muted-foreground">No leave requests yet.</li>}
           </ul>
+          {requests && requests.length === LIST_LIMIT && (
+            <p className="text-xs text-muted-foreground mt-2">
+              Showing the most recent {LIST_LIMIT}. Search and pagination are coming soon.
+            </p>
+          )}
         </CardContent>
       </Card>
     </div>

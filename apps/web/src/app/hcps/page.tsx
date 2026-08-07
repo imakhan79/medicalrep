@@ -3,12 +3,15 @@ import { createClient } from "@/lib/supabase/server"
 import { PageHeader } from "@/components/page-header"
 import { HcpCreateForm } from "./hcp-create-form"
 
+const LIST_LIMIT = 200
+
 export default async function HcpsPage() {
   const supabase = await createClient()
   const { data: hcps, error } = await supabase
     .from("hcps")
     .select("id, first_name, last_name, specialty, tier, consent_status")
     .order("last_name")
+    .limit(LIST_LIMIT)
 
   return (
     <div className="space-y-6">
@@ -52,6 +55,11 @@ export default async function HcpsPage() {
           <li className="p-4 text-sm text-muted-foreground">No HCPs yet.</li>
         )}
       </ul>
+      {hcps && hcps.length === LIST_LIMIT && (
+        <p className="text-xs text-muted-foreground">
+          Showing the most recent {LIST_LIMIT}. Search and pagination are coming soon.
+        </p>
+      )}
     </div>
   )
 }

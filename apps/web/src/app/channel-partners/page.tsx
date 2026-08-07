@@ -3,12 +3,15 @@ import { createClient } from "@/lib/supabase/server"
 import { PageHeader } from "@/components/page-header"
 import { ChannelPartnerForm } from "./channel-partner-form"
 
+const LIST_LIMIT = 200
+
 export default async function ChannelPartnersPage() {
   const supabase = await createClient()
   const { data: partners, error } = await supabase
     .from("channel_partners")
     .select("id, name, type, contact_phone, contact_email")
     .order("name")
+    .limit(LIST_LIMIT)
 
   return (
     <div className="space-y-6">
@@ -44,6 +47,11 @@ export default async function ChannelPartnersPage() {
           <li className="p-4 text-sm text-muted-foreground">No channel partners yet.</li>
         )}
       </ul>
+      {partners && partners.length === LIST_LIMIT && (
+        <p className="text-xs text-muted-foreground">
+          Showing the most recent {LIST_LIMIT}. Search and pagination are coming soon.
+        </p>
+      )}
     </div>
   )
 }

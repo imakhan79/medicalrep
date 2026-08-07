@@ -89,7 +89,7 @@ export default async function TargetsPage() {
                   {pct !== null && (
                     <div className="mt-1.5 h-1.5 rounded-full bg-muted overflow-hidden">
                       <div
-                        className={`h-full ${pct >= 100 ? "bg-teal-600" : "bg-amber-500"}`}
+                        className={`h-full ${pct >= 100 ? "bg-success" : "bg-warning"}`}
                         style={{ width: `${pct}%` }}
                       />
                     </div>

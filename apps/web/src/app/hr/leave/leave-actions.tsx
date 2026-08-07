@@ -1,49 +1,26 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 
 export function LeaveActions({
   leaveId,
-  organizationId,
-  territoryId,
   status,
   isOwner,
+  canApprove,
+  canReject,
 }: {
   leaveId: string
-  organizationId: string
-  territoryId: string | null
   status: string
   isOwner: boolean
+  canApprove: boolean
+  canReject: boolean
 }) {
   const router = useRouter()
-  const [canApprove, setCanApprove] = useState(false)
-  const [canReject, setCanReject] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    const supabase = createClient()
-    Promise.all([
-      supabase.rpc("can_access_row", {
-        p_org_id: organizationId,
-        p_resource_key: "leave_requests",
-        p_action: "approve",
-        p_territory_id: territoryId,
-      }),
-      supabase.rpc("can_access_row", {
-        p_org_id: organizationId,
-        p_resource_key: "leave_requests",
-        p_action: "reject",
-        p_territory_id: territoryId,
-      }),
-    ]).then(([a, r]) => {
-      setCanApprove(Boolean(a.data))
-      setCanReject(Boolean(r.data))
-    })
-  }, [organizationId, territoryId])
 
   async function transition(newStatus: string) {
     setBusy(true)

@@ -9,57 +9,11 @@ export function TrackingControls({ intervalSeconds = 30 }: { intervalSeconds?: n
   const [sessionId, setSessionId] = useState<string | null>(null)
   const [status, setStatus] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [checkingIn, setCheckingIn] = useState(false)
+  const [checkingOut, setCheckingOut] = useState(false)
+  const [sendingSos, setSendingSos] = useState(false)
   const watchIdRef = useRef<number | null>(null)
   const lastSentRef = useRef(0)
-
-  useEffect(() => {
-    return () => {
-      if (watchIdRef.current !== null) navigator.geolocation.clearWatch(watchIdRef.current)
-    }
-  }, [])
-
-  async function handleCheckIn() {
-    setError(null)
-    if (!("geolocation" in navigator)) {
-      setError("Geolocation isn't supported on this device/browser.")
-      return
-    }
-    const supabase = createClient()
-    const orgId = await getCurrentOrgId(supabase)
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-    if (!orgId || !user) {
-      setError("Sign in with an organization membership.")
-      return
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        const { data, error: insertError } = await supabase
-          .from("tracking_sessions")
-          .insert({
-            organization_id: orgId,
-            rep_id: user.id,
-            check_in_lat: pos.coords.latitude,
-            check_in_lng: pos.coords.longitude,
-            tracking_interval_seconds: intervalSeconds,
-          })
-          .select("id")
-          .single()
-
-        if (insertError || !data) {
-          setError(insertError?.message ?? "Could not start tracking session")
-          return
-        }
-        setSessionId(data.id)
-        setStatus("On duty — tracking active")
-        startWatch(data.id, orgId, user.id)
-      },
-      (err) => setError(`Location permission error: ${err.message}`),
-      { enableHighAccuracy: true }
-    )
-  }
 
   function startWatch(sid: string, orgId: string, repId: string) {
     const supabase = createClient()
@@ -97,8 +51,88 @@ export function TrackingControls({ intervalSeconds = 30 }: { intervalSeconds?: n
     )
   }
 
+  useEffect(() => {
+    let cancelled = false
+    async function resume() {
+      const supabase = createClient()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (!user) return
+      const { data } = await supabase
+        .from("tracking_sessions")
+        .select("id, organization_id")
+        .eq("rep_id", user.id)
+        .eq("status", "active")
+        .order("check_in_at", { ascending: false })
+        .limit(1)
+        .maybeSingle()
+      if (cancelled || !data) return
+      setSessionId(data.id)
+      setStatus("On duty — tracking resumed")
+      startWatch(data.id, data.organization_id, user.id)
+    }
+    resume()
+    return () => {
+      cancelled = true
+      if (watchIdRef.current !== null) navigator.geolocation.clearWatch(watchIdRef.current)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- one-time resume on mount
+  }, [])
+
+  async function handleCheckIn() {
+    setError(null)
+    if (!("geolocation" in navigator)) {
+      setError("Geolocation isn't supported on this device/browser.")
+      return
+    }
+    setCheckingIn(true)
+    const supabase = createClient()
+    const orgId = await getCurrentOrgId(supabase)
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!orgId || !user) {
+      setError("Sign in with an organization membership.")
+      setCheckingIn(false)
+      return
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { data, error: insertError } = await supabase
+          .from("tracking_sessions")
+          .insert({
+            organization_id: orgId,
+            rep_id: user.id,
+            check_in_lat: pos.coords.latitude,
+            check_in_lng: pos.coords.longitude,
+            tracking_interval_seconds: intervalSeconds,
+          })
+          .select("id")
+          .single()
+
+        if (insertError || !data) {
+          setError(insertError?.message ?? "Could not start tracking session")
+          setCheckingIn(false)
+          return
+        }
+        setSessionId(data.id)
+        setStatus("On duty — tracking active")
+        setCheckingIn(false)
+        startWatch(data.id, orgId, user.id)
+      },
+      (err) => {
+        setError(`Location permission error: ${err.message}`)
+        setCheckingIn(false)
+      },
+      { enableHighAccuracy: true }
+    )
+  }
+
   async function handleCheckOut() {
     if (!sessionId) return
+    setCheckingOut(true)
     if (watchIdRef.current !== null) {
       navigator.geolocation.clearWatch(watchIdRef.current)
       watchIdRef.current = null
@@ -111,40 +145,55 @@ export function TrackingControls({ intervalSeconds = 30 }: { intervalSeconds?: n
     if (updateError) setError(updateError.message)
     setSessionId(null)
     setStatus("Off duty")
+    setCheckingOut(false)
   }
 
   async function handleSOS() {
     if (!confirm("Trigger an emergency SOS alert? This notifies your managers immediately.")) return
+    setSendingSos(true)
     const supabase = createClient()
     const orgId = await getCurrentOrgId(supabase)
     const {
       data: { user },
     } = await supabase.auth.getUser()
-    if (!orgId || !user) return
+    if (!orgId || !user) {
+      setSendingSos(false)
+      return
+    }
 
-    navigator.geolocation.getCurrentPosition(async (pos) => {
-      const { error: sosError } = await supabase.from("sos_incidents").insert({
-        organization_id: orgId,
-        rep_id: user.id,
-        latitude: pos.coords.latitude,
-        longitude: pos.coords.longitude,
-      })
-      setStatus(sosError ? null : "SOS sent — help is on the way")
-      if (sosError) setError(sosError.message)
-    })
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { error: sosError } = await supabase.from("sos_incidents").insert({
+          organization_id: orgId,
+          rep_id: user.id,
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
+        })
+        setStatus(sosError ? null : "SOS sent — help is on the way")
+        if (sosError) setError(sosError.message)
+        setSendingSos(false)
+      },
+      (err) => {
+        setError(`Location permission error: ${err.message}`)
+        setSendingSos(false)
+      },
+      { enableHighAccuracy: true }
+    )
   }
 
   return (
     <div className="flex flex-wrap items-center gap-3 rounded-md border p-3">
       {!sessionId ? (
-        <Button onClick={handleCheckIn}>Go On Duty (Check In)</Button>
+        <Button onClick={handleCheckIn} disabled={checkingIn}>
+          {checkingIn ? "Checking in…" : "Go On Duty (Check In)"}
+        </Button>
       ) : (
-        <Button variant="outline" onClick={handleCheckOut}>
-          Check Out
+        <Button variant="outline" onClick={handleCheckOut} disabled={checkingOut}>
+          {checkingOut ? "Checking out…" : "Check Out"}
         </Button>
       )}
-      <Button variant="destructive" onClick={handleSOS}>
-        SOS
+      <Button variant="destructive" onClick={handleSOS} disabled={sendingSos}>
+        {sendingSos ? "Sending SOS…" : "SOS"}
       </Button>
       {status && <span className="text-sm text-primary">{status}</span>}
       {error && (

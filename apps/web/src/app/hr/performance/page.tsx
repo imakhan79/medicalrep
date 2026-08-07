@@ -6,6 +6,8 @@ import { NewReviewForm } from "./new-review-form"
 import { AcknowledgeButton } from "./acknowledge-button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
+const LIST_LIMIT = 200
+
 export default async function PerformancePage() {
   const supabase = await createClient()
   const orgId = await getCurrentOrgId(supabase)
@@ -20,7 +22,8 @@ export default async function PerformancePage() {
     supabase
       .from("performance_reviews")
       .select("id, rep_id, review_period, rating, strengths, improvements, status")
-      .order("created_at", { ascending: false }),
+      .order("created_at", { ascending: false })
+      .limit(LIST_LIMIT),
   ])
 
   const memberList = (members as { user_id: string; email: string }[] | null) ?? []
@@ -65,6 +68,11 @@ export default async function PerformancePage() {
             ))}
             {reviews?.length === 0 && <li className="p-3 text-sm text-muted-foreground">No reviews yet.</li>}
           </ul>
+          {reviews && reviews.length === LIST_LIMIT && (
+            <p className="text-xs text-muted-foreground mt-2">
+              Showing the most recent {LIST_LIMIT}. Search and pagination are coming soon.
+            </p>
+          )}
         </CardContent>
       </Card>
     </div>

@@ -72,7 +72,7 @@ export default async function NextBestActionsPage() {
                 </div>
                 <div className="h-1.5 rounded-full bg-muted overflow-hidden">
                   <div
-                    className="h-full bg-teal-600"
+                    className="h-full bg-primary"
                     style={{ width: `${Math.round((r.priority_score / maxScore) * 100)}%` }}
                   />
                 </div>

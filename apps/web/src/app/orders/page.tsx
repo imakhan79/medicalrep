@@ -13,6 +13,8 @@ const STATUS_STYLES: Record<string, string> = {
   rejected: "bg-destructive-soft text-destructive",
 }
 
+const LIST_LIMIT = 200
+
 export default async function OrdersPage() {
   const supabase = await createClient()
 
@@ -22,6 +24,7 @@ export default async function OrdersPage() {
     .from("orders")
     .select("id, order_date, status, fulfillment_status, channel_partners(name)")
     .order("created_at", { ascending: false })
+    .limit(LIST_LIMIT)
 
   return (
     <div className="space-y-6">
@@ -67,6 +70,11 @@ export default async function OrdersPage() {
               <li className="p-3 text-sm text-muted-foreground">No orders yet.</li>
             )}
           </ul>
+          {orders && orders.length === LIST_LIMIT && (
+            <p className="text-xs text-muted-foreground mt-2">
+              Showing the most recent {LIST_LIMIT}. Search and pagination are coming soon.
+            </p>
+          )}
         </CardContent>
       </Card>
     </div>

@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server"
 import { PageHeader } from "@/components/page-header"
 import { VisitCheckinForm } from "./visit-checkin-form"
 
+const LIST_LIMIT = 50
+
 export default async function VisitsPage() {
   const supabase = await createClient()
   const { data: hcps } = await supabase
@@ -16,7 +18,7 @@ export default async function VisitsPage() {
     .from("visits")
     .select("id, hcp_id, visited_at, objective, outcome_notes, hcps(first_name, last_name)")
     .order("visited_at", { ascending: false })
-    .limit(50)
+    .limit(LIST_LIMIT)
 
   return (
     <div className="space-y-6">
@@ -53,6 +55,11 @@ export default async function VisitsPage() {
           <li className="p-4 text-sm text-muted-foreground">No visits logged yet.</li>
         )}
       </ul>
+      {visits && visits.length === LIST_LIMIT && (
+        <p className="text-xs text-muted-foreground">
+          Showing the most recent {LIST_LIMIT}. Search and pagination are coming soon.
+        </p>
+      )}
     </div>
   )
 }

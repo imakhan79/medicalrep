@@ -33,8 +33,9 @@ export default async function StaffAdminPage() {
     )
   }
 
+  const LIST_LIMIT = 200
   const [{ data: members }, { data: roles }, { data: territories }] = await Promise.all([
-    supabase.rpc("list_org_members", { p_org_id: orgId }),
+    supabase.rpc("list_org_members", { p_org_id: orgId }).limit(LIST_LIMIT),
     supabase
       .from("roles")
       .select("id, key, name")
@@ -62,6 +63,7 @@ export default async function StaffAdminPage() {
         territories={territories ?? []}
         canEdit={Boolean(canEdit)}
         canDelete={Boolean(canDelete)}
+        listLimit={LIST_LIMIT}
       />
     </div>
   )

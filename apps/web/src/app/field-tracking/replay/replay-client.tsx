@@ -41,6 +41,12 @@ export function ReplayClient({ members }: { members: Member[] }) {
     if (!repId || !date) return
     setLoading(true)
     setError(null)
+    setPoints([])
+    setEvents([])
+    setSessions([])
+    setPlanned([])
+    setActual([])
+    setPlayIndex(0)
     const supabase = createClient()
     const dayStart = `${date}T00:00:00`
     const dayEnd = `${date}T23:59:59.999`
@@ -98,7 +104,6 @@ export function ReplayClient({ members }: { members: Member[] }) {
     setSessions((sessionsRes.data as Session[]) ?? [])
     setActual((actualRes.data as unknown as HcpVisit[]) ?? [])
     setPlanned(plannedVisits)
-    setPlayIndex(0)
     setLoading(false)
   }
 
@@ -314,7 +319,7 @@ export function ReplayClient({ members }: { members: Member[] }) {
           </p>
           {missed.length > 0 && (
             <div>
-              <p className="font-medium text-red-700 dark:text-red-400">Missed (planned, not visited)</p>
+              <p className="font-medium text-destructive">Missed (planned, not visited)</p>
               <ul className="list-disc list-inside">
                 {missed.map((m) => (
                   <li key={m.hcp_id}>{m.hcps?.first_name} {m.hcps?.last_name}</li>

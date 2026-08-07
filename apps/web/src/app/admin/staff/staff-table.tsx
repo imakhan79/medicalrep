@@ -27,6 +27,7 @@ export function StaffTable({
   territories,
   canEdit,
   canDelete,
+  listLimit,
 }: {
   orgId: string
   members: Member[]
@@ -34,6 +35,7 @@ export function StaffTable({
   territories: Territory[]
   canEdit: boolean
   canDelete: boolean
+  listLimit?: number
 }) {
   const router = useRouter()
   const [busyId, setBusyId] = useState<string | null>(null)
@@ -199,6 +201,11 @@ export function StaffTable({
             </tbody>
           </table>
         </div>
+        {listLimit && members.length === listLimit && (
+          <p className="text-xs text-muted-foreground mt-2">
+            Showing the most recent {listLimit}. Search and pagination are coming soon.
+          </p>
+        )}
       </CardContent>
     </Card>
   )

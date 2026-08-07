@@ -13,6 +13,8 @@ const STATUS_STYLES: Record<string, string> = {
   rejected: "bg-destructive-soft text-destructive",
 }
 
+const LIST_LIMIT = 200
+
 export default async function ExpenseClaimsPage() {
   const supabase = await createClient()
 
@@ -20,6 +22,7 @@ export default async function ExpenseClaimsPage() {
     .from("expense_claims")
     .select("id, category, amount, currency, expense_date, status, description")
     .order("created_at", { ascending: false })
+    .limit(LIST_LIMIT)
 
   return (
     <div className="space-y-6">
@@ -65,6 +68,11 @@ export default async function ExpenseClaimsPage() {
               <li className="p-3 text-sm text-muted-foreground">No expense claims yet.</li>
             )}
           </ul>
+          {claims && claims.length === LIST_LIMIT && (
+            <p className="text-xs text-muted-foreground mt-2">
+              Showing the most recent {LIST_LIMIT}. Search and pagination are coming soon.
+            </p>
+          )}
         </CardContent>
       </Card>
     </div>
