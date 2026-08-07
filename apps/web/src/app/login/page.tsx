@@ -8,43 +8,72 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Radar, Workflow, ShieldCheck } from "lucide-react"
+import {
+  Radar,
+  Workflow,
+  ShieldCheck,
+  ShieldAlert,
+  Building2,
+  Briefcase,
+  TrendingUp,
+  Map,
+  Compass,
+  Target,
+  MapPin,
+  Stethoscope,
+  Handshake,
+  Package,
+  Megaphone,
+  Users,
+  Receipt,
+  Boxes,
+  ShoppingCart,
+  LifeBuoy,
+  ClipboardCheck,
+  User,
+  Loader2,
+  ChevronRight,
+  type LucideIcon,
+} from "lucide-react"
 
 const DEMO_PASSWORD = "DevPassword123!"
 
-const DEMO_GROUPS = [
+const DEMO_GROUPS: { label: string; accent: string; accounts: { role: string; email: string; icon: LucideIcon }[] }[] = [
   {
     label: "Leadership",
+    accent: "var(--primary)",
     accounts: [
-      { role: "Super Admin", email: "superadmin@medicalrep.dev" },
-      { role: "Platform Owner", email: "platformowner@medicalrep.dev" },
-      { role: "Company Admin", email: "admin1@medicalrep.dev" },
-      { role: "National Sales Manager", email: "nationalmanager@medicalrep.dev" },
-      { role: "Zonal Manager", email: "zonalmanager@medicalrep.dev" },
-      { role: "Regional Manager", email: "manager1@medicalrep.dev" },
-      { role: "Area Sales Manager", email: "areamanager@medicalrep.dev" },
-      { role: "Territory Manager", email: "territorymanager@medicalrep.dev" },
+      { role: "Super Admin", email: "superadmin@medicalrep.dev", icon: ShieldAlert },
+      { role: "Platform Owner", email: "platformowner@medicalrep.dev", icon: Building2 },
+      { role: "Company Admin", email: "admin1@medicalrep.dev", icon: Briefcase },
+      { role: "National Sales Manager", email: "nationalmanager@medicalrep.dev", icon: TrendingUp },
+      { role: "Zonal Manager", email: "zonalmanager@medicalrep.dev", icon: Map },
+      { role: "Regional Manager", email: "manager1@medicalrep.dev", icon: Compass },
+      { role: "Area Sales Manager", email: "areamanager@medicalrep.dev", icon: Target },
+      { role: "Territory Manager", email: "territorymanager@medicalrep.dev", icon: MapPin },
     ],
   },
   {
     label: "Field & Commercial",
+    accent: "var(--accent)",
     accounts: [
-      { role: "Medical Representative", email: "rep1@medicalrep.dev" },
-      { role: "Key Account Manager", email: "kam@medicalrep.dev" },
-      { role: "Product Manager", email: "productmanager@medicalrep.dev" },
-      { role: "Marketing Manager", email: "marketingmanager@medicalrep.dev" },
+      { role: "Medical Representative", email: "rep1@medicalrep.dev", icon: Stethoscope },
+      { role: "Key Account Manager", email: "kam@medicalrep.dev", icon: Handshake },
+      { role: "Product Manager", email: "productmanager@medicalrep.dev", icon: Package },
+      { role: "Marketing Manager", email: "marketingmanager@medicalrep.dev", icon: Megaphone },
     ],
   },
   {
     label: "Operations & Support",
+    accent: "var(--chart-3)",
     accounts: [
-      { role: "HR", email: "hr@medicalrep.dev" },
-      { role: "Finance", email: "finance@medicalrep.dev" },
-      { role: "Warehouse Manager", email: "warehouse@medicalrep.dev" },
-      { role: "Purchasing Officer", email: "purchasing@medicalrep.dev" },
-      { role: "Customer Support", email: "support@medicalrep.dev" },
-      { role: "Auditor", email: "auditor@medicalrep.dev" },
-      { role: "Guest", email: "guest@medicalrep.dev" },
+      { role: "HR", email: "hr@medicalrep.dev", icon: Users },
+      { role: "Finance", email: "finance@medicalrep.dev", icon: Receipt },
+      { role: "Warehouse Manager", email: "warehouse@medicalrep.dev", icon: Boxes },
+      { role: "Purchasing Officer", email: "purchasing@medicalrep.dev", icon: ShoppingCart },
+      { role: "Customer Support", email: "support@medicalrep.dev", icon: LifeBuoy },
+      { role: "Auditor", email: "auditor@medicalrep.dev", icon: ClipboardCheck },
+      { role: "Guest", email: "guest@medicalrep.dev", icon: User },
     ],
   },
 ]
@@ -177,29 +206,50 @@ export default function LoginPage() {
           <CardHeader>
             <CardTitle className="text-base">Quick demo login</CardTitle>
             <p className="text-sm text-muted-foreground">
-              One click per role — dev-only accounts, all password {DEMO_PASSWORD}.
+              One tap per role — dev-only accounts, all password {DEMO_PASSWORD}.
             </p>
           </CardHeader>
-          <CardContent className="space-y-5">
+          <CardContent className="space-y-6">
             {DEMO_GROUPS.map((group) => (
               <div key={group.label}>
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/80 mb-2">
-                  {group.label}
-                </p>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {group.accounts.map((account) => (
-                    <Button
-                      key={account.email}
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      disabled={demoLoadingEmail !== null}
-                      onClick={() => handleDemoLogin(account.email)}
-                      className="justify-start"
-                    >
-                      {demoLoadingEmail === account.email ? "Signing in…" : account.role}
-                    </Button>
-                  ))}
+                <div className="flex items-center gap-2 mb-2.5">
+                  <span className="size-1.5 rounded-full" style={{ background: group.accent }} aria-hidden />
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/80">
+                    {group.label}
+                  </p>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {group.accounts.map((account) => {
+                    const isLoading = demoLoadingEmail === account.email
+                    return (
+                      <button
+                        key={account.email}
+                        type="button"
+                        disabled={demoLoadingEmail !== null}
+                        onClick={() => handleDemoLogin(account.email)}
+                        className="group flex items-center gap-2.5 rounded-lg border border-border bg-card p-2.5 text-left transition-colors hover:border-transparent hover:bg-[color-mix(in_oklch,var(--tile-accent),transparent_92%)] hover:shadow-[var(--shadow-sm)] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                        style={{ "--tile-accent": group.accent } as React.CSSProperties}
+                      >
+                        <span
+                          className="grid place-items-center size-8 rounded-md shrink-0"
+                          style={{ background: `color-mix(in oklch, ${group.accent}, transparent 85%)`, color: group.accent }}
+                        >
+                          <account.icon className="size-4" aria-hidden />
+                        </span>
+                        <span className="min-w-0 flex-1 text-sm font-medium text-foreground truncate">
+                          {account.role}
+                        </span>
+                        {isLoading ? (
+                          <Loader2 className="size-3.5 shrink-0 animate-spin text-muted-foreground" aria-hidden />
+                        ) : (
+                          <ChevronRight
+                            className="size-3.5 shrink-0 text-muted-foreground opacity-0 -translate-x-1 transition-all group-hover:opacity-100 group-hover:translate-x-0"
+                            aria-hidden
+                          />
+                        )}
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
             ))}
