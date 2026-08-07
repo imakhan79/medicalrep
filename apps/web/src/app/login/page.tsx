@@ -51,7 +51,7 @@ export default function LoginPage() {
       setError(signInError.message)
       return false
     }
-    router.push("/")
+    router.push("/dashboard")
     router.refresh()
     return true
   }
@@ -79,6 +79,7 @@ export default function LoginPage() {
           alt=""
           fill
           priority
+          sizes="(max-width: 1024px) 100vw, 40vw"
           className="object-cover object-[center_25%]"
         />
         <div

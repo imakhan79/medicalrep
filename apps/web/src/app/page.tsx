@@ -1,152 +1,162 @@
 import Image from "next/image"
-import { Stethoscope, ClipboardList, CalendarCheck2, TrendingUp } from "lucide-react"
-import { createClient } from "@/lib/supabase/server"
-import { getCurrentOrgId } from "@/lib/org"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import Link from "next/link"
+import {
+  Radar,
+  ShieldCheck,
+  Workflow,
+  Sparkles,
+  Users,
+  ClipboardCheck,
+  ArrowRight,
+} from "lucide-react"
+import { buttonVariants } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 
-type TeamRow = {
-  rep_id: string
-  email: string
-  visits_this_month: number
-  visits_today: number
-  total_hcps: number
-  visited_hcps: number
-  coverage_pct: number
-}
+const features = [
+  {
+    icon: Radar,
+    title: "Live Field Tracking",
+    body: "Real-time GPS, geofenced visit detection, route replay, and statistical anti-spoofing — not a simple map widget.",
+  },
+  {
+    icon: Workflow,
+    title: "Built-In Approval Engine",
+    body: "Tour plans, expense claims, orders, and leave all route through the same auditable draft → submit → approve workflow.",
+  },
+  {
+    icon: Sparkles,
+    title: "Deterministic AI Intelligence",
+    body: "Next-best-action visit priority, territory load balancing, and anomaly detection — explainable, not a black box.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Enterprise RBAC + ABAC",
+    body: "19 configurable roles with platform, org, hierarchy, territory, and own-record scoping enforced at the database layer.",
+  },
+  {
+    icon: Users,
+    title: "Every Role, One Platform",
+    body: "From Medical Representative to Platform Owner — dedicated permissions, dashboards, and workflows for each.",
+  },
+  {
+    icon: ClipboardCheck,
+    title: "HR & Compliance Built In",
+    body: "GPS-derived attendance, leave approvals, performance reviews, and an immutable audit log across every module.",
+  },
+]
 
-function currentPeriodMonth() {
-  const d = new Date()
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`
-}
-
-export default async function DashboardPage() {
-  const supabase = await createClient()
-  const orgId = await getCurrentOrgId(supabase)
-
-  const [{ count: hcpCount }, { count: visitCount }, { count: todayCount }] =
-    await Promise.all([
-      supabase.from("hcps").select("*", { count: "exact", head: true }),
-      supabase.from("visits").select("*", { count: "exact", head: true }),
-      supabase
-        .from("visits")
-        .select("*", { count: "exact", head: true })
-        .gte("visited_at", new Date().toISOString().slice(0, 10)),
-    ])
-
-  const { data: team } = orgId
-    ? await supabase.rpc("team_dashboard", { p_org_id: orgId, p_period_month: currentPeriodMonth() })
-    : { data: null }
-
-  const teamRows = (team as TeamRow[] | null) ?? []
-  const avgCoverage = teamRows.length
-    ? Math.round(teamRows.reduce((sum, r) => sum + r.coverage_pct, 0) / teamRows.length)
-    : 0
-
-  const stats = [
-    { label: "HCPs in view", value: hcpCount ?? 0, icon: Stethoscope },
-    { label: "Total visits logged", value: visitCount ?? 0, icon: ClipboardList },
-    { label: "Visits today", value: todayCount ?? 0, icon: CalendarCheck2 },
-    { label: "Avg. territory coverage", value: `${avgCoverage}%`, icon: TrendingUp },
-  ]
-
+export default function HomePage() {
   return (
-    <div className="space-y-6">
-      <div className="relative overflow-hidden rounded-2xl p-8 sm:p-10 text-primary-foreground min-h-[220px] flex items-center">
+    <div className="space-y-16 sm:space-y-24 pb-8">
+      <section className="relative overflow-hidden rounded-2xl min-h-[440px] sm:min-h-[520px] flex items-center -mt-2">
         <Image
           src="/images/hero-healthcare.jpg"
           alt=""
           fill
           priority
-          className="object-cover object-[center_20%]"
+          sizes="(max-width: 768px) 100vw, 1152px"
+          className="object-cover object-[center_18%]"
         />
         <div
           aria-hidden
           className="absolute inset-0"
-          style={{ background: "linear-gradient(115deg, #602020 15%, rgba(60,20,20,0.94) 45%, rgba(53,71,77,0.55) 100%)" }}
+          style={{
+            background:
+              "linear-gradient(120deg, #602020 12%, rgba(61,20,20,0.93) 42%, rgba(53,71,77,0.55) 85%)",
+          }}
         />
         <div
           aria-hidden
-          className="absolute -right-16 -top-16 size-64 rounded-full opacity-[0.15]"
+          className="absolute -right-24 -top-24 size-80 rounded-full opacity-[0.16] blur-[2px]"
           style={{ background: "#f8b028" }}
         />
-        <div className="relative flex flex-col sm:flex-row sm:items-center gap-6">
-          <div className="bg-white rounded-lg p-2 shrink-0 w-fit shadow-[var(--shadow-lg)]">
-            <Image src="/zicon-logo.png" alt="Zicon Technology" width={104} height={42} priority />
+
+        <div className="relative w-full px-6 sm:px-12 py-14 flex flex-col items-start gap-6 max-w-3xl">
+          <div className="bg-white rounded-lg p-2.5 shadow-[var(--shadow-lg)]">
+            <Image src="/zicon-logo.png" alt="Zicon Technology" width={130} height={53} priority />
           </div>
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/60 mb-1">
-              Field Force Intelligence
-            </p>
-            <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight">Dashboard</h1>
-            <p className="text-white/75 text-sm mt-1.5 max-w-xl">
-              Your coverage at a glance — territory-scoped in real time to your role.
-            </p>
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-white/10 backdrop-blur px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-white/85">
+            Field Force Intelligence Platform
+          </div>
+          <h1 className="text-4xl sm:text-6xl font-semibold tracking-tight text-white leading-[1.05]">
+            Medical Rep CRM,
+            <br />
+            built for the field.
+          </h1>
+          <p className="text-white/85 text-base sm:text-lg max-w-xl leading-relaxed">
+            Territory-aware RBAC, live GPS tracking, deterministic AI intelligence, and a
+            single approval engine connecting every workflow — from HCP visits to
+            expense claims to secondary sales orders.
+          </p>
+          <div className="flex flex-wrap items-center gap-3 pt-2">
+            <Link href="/login" className={buttonVariants({ size: "lg" })}>
+              Sign in <ArrowRight className="size-4" aria-hidden />
+            </Link>
+            <Link
+              href="/login"
+              className={buttonVariants({ variant: "outline", size: "lg" })}
+              style={{ background: "rgba(255,255,255,0.06)", color: "white", borderColor: "rgba(255,255,255,0.3)" }}
+            >
+              Explore the demo
+            </Link>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
-          <Card key={stat.label}>
-            <CardContent className="pt-5 flex items-start justify-between gap-3">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
-                <p className="text-3xl font-semibold tracking-tight text-foreground mt-1">{stat.value}</p>
-              </div>
-              <div className="shrink-0 grid place-items-center size-10 rounded-lg bg-primary-soft text-primary">
-                <stat.icon className="size-5" aria-hidden />
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <section>
+        <div className="max-w-2xl mb-8">
+          <p className="text-sm font-semibold uppercase tracking-wider text-primary mb-2">Platform</p>
+          <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">
+            One system for field ops, compliance, and intelligence.
+          </h2>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {features.map((f) => (
+            <Card key={f.title}>
+              <CardContent className="pt-6">
+                <div className="grid place-items-center size-11 rounded-lg bg-primary-soft text-primary mb-4">
+                  <f.icon className="size-5" aria-hidden />
+                </div>
+                <h3 className="font-semibold text-foreground mb-1.5">{f.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{f.body}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
 
-      {teamRows.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">
-              {teamRows.length === 1 ? "My coverage this month" : "Team coverage this month"}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto rounded-lg border border-border">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-divider bg-muted/60">
-                    <th scope="col" className="text-left p-3 font-medium text-muted-foreground">Rep</th>
-                    <th scope="col" className="text-left p-3 font-medium text-muted-foreground">Visits today</th>
-                    <th scope="col" className="text-left p-3 font-medium text-muted-foreground">Visits this month</th>
-                    <th scope="col" className="text-left p-3 font-medium text-muted-foreground">HCP coverage</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {teamRows.map((row) => (
-                    <tr key={row.rep_id} className="border-b border-divider last:border-0 hover:bg-muted/40 transition-colors duration-150">
-                      <td className="p-3 font-medium">{row.email}</td>
-                      <td className="p-3">{row.visits_today}</td>
-                      <td className="p-3">{row.visits_this_month}</td>
-                      <td className="p-3">
-                        <div className="flex items-center gap-2">
-                          <span className="tabular-nums">
-                            {row.visited_hcps}/{row.total_hcps}
-                          </span>
-                          <span className="h-1.5 w-16 rounded-full bg-muted overflow-hidden">
-                            <span
-                              className="block h-full rounded-full bg-primary"
-                              style={{ width: `${Math.min(100, row.coverage_pct)}%` }}
-                            />
-                          </span>
-                          <span className="text-muted-foreground text-xs">{row.coverage_pct}%</span>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      <section className="relative overflow-hidden rounded-2xl">
+        <div className="relative min-h-[320px] flex items-center">
+          <Image
+            src="/images/hero-team.jpg"
+            alt=""
+            fill
+            sizes="(max-width: 768px) 100vw, 1152px"
+            className="object-cover object-[center_30%]"
+          />
+          <div
+            aria-hidden
+            className="absolute inset-0"
+            style={{ background: "linear-gradient(90deg, rgba(53,71,77,0.92) 0%, rgba(53,71,77,0.7) 55%, rgba(53,71,77,0.25) 100%)" }}
+          />
+          <div className="relative px-6 sm:px-12 py-12 max-w-lg">
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white mb-3">
+              Nineteen roles. One connected platform.
+            </h2>
+            <p className="text-white/85 text-sm sm:text-base leading-relaxed mb-6">
+              Super Admin to Medical Representative — every role gets its own permissions,
+              territory-scoped visibility, and dashboard, configurable without touching code.
+            </p>
+            <Link
+              href="/login"
+              className={buttonVariants({ size: "lg" })}
+              style={{ background: "white", color: "#602020" }}
+            >
+              See it in action <ArrowRight className="size-4" aria-hidden />
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
   )
 }

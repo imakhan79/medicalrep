@@ -110,6 +110,8 @@ export function NavBar() {
     window.location.href = "/login"
   }
 
+  const isHome = pathname === "/"
+
   return (
     <header className="border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80 sticky top-0 z-20">
       <div className="max-w-6xl mx-auto flex items-center gap-3 px-4 sm:px-6 py-3">
@@ -120,20 +122,31 @@ export function NavBar() {
             Medical Rep CRM
           </span>
         </Link>
-        <Link
-          href="/"
-          className={`ml-1 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors duration-200 ${
-            pathname === "/"
-              ? "bg-primary text-primary-foreground shadow-[var(--shadow-sm)]"
-              : "text-foreground/70 hover:bg-muted hover:text-foreground"
-          }`}
-        >
-          <LayoutDashboard className="size-4" aria-hidden />
-          Dashboard
-        </Link>
+        {!isHome && (
+          <Link
+            href="/dashboard"
+            className={`ml-1 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors duration-200 ${
+              pathname === "/dashboard"
+                ? "bg-primary text-primary-foreground shadow-[var(--shadow-sm)]"
+                : "text-foreground/70 hover:bg-muted hover:text-foreground"
+            }`}
+          >
+            <LayoutDashboard className="size-4" aria-hidden />
+            Dashboard
+          </Link>
+        )}
         <span className="ml-auto flex items-center gap-2 text-sm">
           {email ? (
             <>
+              {isHome && (
+                <Link
+                  href="/dashboard"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-primary text-primary-foreground hover:bg-primary-hover transition-colors duration-200"
+                >
+                  <LayoutDashboard className="size-4" aria-hidden />
+                  Go to dashboard
+                </Link>
+              )}
               <span className="hidden md:inline text-muted-foreground text-xs px-2.5 py-1 rounded-full bg-muted">
                 {email}
               </span>
@@ -156,6 +169,7 @@ export function NavBar() {
           )}
         </span>
       </div>
+      {!isHome && (
       <nav aria-label="Primary" className="max-w-6xl mx-auto flex items-stretch gap-6 overflow-x-auto px-4 sm:px-6 pb-3">
         {groups.map((group) => (
           <div key={group.label} className="shrink-0">
@@ -186,6 +200,7 @@ export function NavBar() {
           </div>
         ))}
       </nav>
+      )}
     </header>
   )
 }
