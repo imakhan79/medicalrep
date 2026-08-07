@@ -73,10 +73,19 @@ export default function LoginPage() {
 
   return (
     <div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_1.4fr] lg:items-start">
-      <div
-        className="relative overflow-hidden rounded-xl p-8 text-primary-foreground flex flex-col justify-between min-h-[280px]"
-        style={{ background: "linear-gradient(145deg, #602020 0%, #3d1414 55%, #35474d 130%)" }}
-      >
+      <div className="relative overflow-hidden rounded-xl p-8 text-primary-foreground flex flex-col justify-between min-h-[280px]">
+        <Image
+          src="/images/hero-team.jpg"
+          alt=""
+          fill
+          priority
+          className="object-cover object-[center_25%]"
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{ background: "linear-gradient(155deg, #602020 20%, rgba(61,20,20,0.95) 50%, rgba(53,71,77,0.6) 100%)" }}
+        />
         <div
           aria-hidden
           className="absolute -right-10 -top-10 size-48 rounded-full opacity-20"

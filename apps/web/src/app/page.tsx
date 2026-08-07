@@ -51,19 +51,23 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div
-        className="relative overflow-hidden rounded-2xl p-8 sm:p-10 text-primary-foreground"
-        style={{ background: "linear-gradient(135deg, #602020 0%, #3d1414 55%, #35474d 145%)" }}
-      >
-        <div
-          aria-hidden
-          className="absolute -right-16 -top-16 size-64 rounded-full opacity-[0.12]"
-          style={{ background: "#f8b028" }}
+      <div className="relative overflow-hidden rounded-2xl p-8 sm:p-10 text-primary-foreground min-h-[220px] flex items-center">
+        <Image
+          src="/images/hero-healthcare.jpg"
+          alt=""
+          fill
+          priority
+          className="object-cover object-[center_20%]"
         />
         <div
           aria-hidden
-          className="absolute right-24 bottom-0 size-32 rounded-full opacity-[0.08]"
-          style={{ background: "#a4b4b6" }}
+          className="absolute inset-0"
+          style={{ background: "linear-gradient(115deg, #602020 15%, rgba(60,20,20,0.94) 45%, rgba(53,71,77,0.55) 100%)" }}
+        />
+        <div
+          aria-hidden
+          className="absolute -right-16 -top-16 size-64 rounded-full opacity-[0.15]"
+          style={{ background: "#f8b028" }}
         />
         <div className="relative flex flex-col sm:flex-row sm:items-center gap-6">
           <div className="bg-white rounded-lg p-2 shrink-0 w-fit shadow-[var(--shadow-lg)]">
