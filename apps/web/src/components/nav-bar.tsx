@@ -11,6 +11,7 @@ const links = [
   { href: "/tour-plans", label: "Tour Plans" },
   { href: "/expense-claims", label: "Expense Claims" },
   { href: "/sample-inventory", label: "Sample Inventory" },
+  { href: "/targets", label: "Targets" },
   { href: "/admin/roles", label: "Roles & Permissions" },
   { href: "/admin/staff", label: "Staff" },
 ]

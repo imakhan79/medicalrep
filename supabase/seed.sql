@@ -140,6 +140,7 @@ begin
       ('area_sales_manager', 'expense_claims', array['view','approve'], 'hierarchy'),
       ('area_sales_manager', 'sample_inventory', array['view','assign'], 'hierarchy'),
       ('area_sales_manager', 'reports', array['view'], 'hierarchy'),
+      ('area_sales_manager', 'targets', array['view','edit'], 'hierarchy'),
 
       ('territory_manager', 'hcos', array['view'], 'territory'),
       ('territory_manager', 'hcps', array['view','create','edit'], 'territory'),
@@ -157,6 +158,8 @@ begin
       ('medical_representative', 'tour_plans', array['view','create','edit'], 'own'),
       ('medical_representative', 'expense_claims', array['view','create','edit'], 'own'),
       ('medical_representative', 'sample_inventory', array['view'], 'own'),
+      ('medical_representative', 'targets', array['view'], 'own'),
+      ('medical_representative', 'reports', array['view'], 'own'),
 
       ('key_account_manager', 'hcos', array['view','edit'], 'territory'),
       ('key_account_manager', 'hcps', array['view','edit'], 'territory'),
@@ -165,6 +168,8 @@ begin
       ('key_account_manager', 'tour_plans', array['view','create','edit'], 'own'),
       ('key_account_manager', 'expense_claims', array['view','create','edit'], 'own'),
       ('key_account_manager', 'orders', array['view','create'], 'own'),
+      ('key_account_manager', 'targets', array['view'], 'own'),
+      ('key_account_manager', 'reports', array['view'], 'own'),
 
       -- Functional / back-office roles
       ('product_manager', 'products', array['view','create','edit','delete','configure'], 'org'),
@@ -336,4 +341,9 @@ on conflict (id) do nothing;
 insert into public.sample_allocations (id, organization_id, rep_id, product_id, period_month, allocated_qty, notes) values
   ('00000000-0000-0000-0000-000000000060', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-0000000000a1',
    '00000000-0000-0000-0000-000000000040', date_trunc('month', current_date)::date, 20, 'Monthly allocation')
+on conflict (id) do nothing;
+
+insert into public.targets (id, organization_id, rep_id, metric_type, period_month, target_value, notes) values
+  ('00000000-0000-0000-0000-000000000070', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-0000000000a1',
+   'visit_count', date_trunc('month', current_date)::date, 15, 'Monthly visit frequency target')
 on conflict (id) do nothing;

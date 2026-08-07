@@ -1,8 +1,25 @@
 import { createClient } from "@/lib/supabase/server"
+import { getCurrentOrgId } from "@/lib/org"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+
+type TeamRow = {
+  rep_id: string
+  email: string
+  visits_this_month: number
+  visits_today: number
+  total_hcps: number
+  visited_hcps: number
+  coverage_pct: number
+}
+
+function currentPeriodMonth() {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`
+}
 
 export default async function DashboardPage() {
   const supabase = await createClient()
+  const orgId = await getCurrentOrgId(supabase)
 
   const [{ count: hcpCount }, { count: visitCount }, { count: todayCount }] =
     await Promise.all([
@@ -14,11 +31,17 @@ export default async function DashboardPage() {
         .gte("visited_at", new Date().toISOString().slice(0, 10)),
     ])
 
+  const { data: team } = orgId
+    ? await supabase.rpc("team_dashboard", { p_org_id: orgId, p_period_month: currentPeriodMonth() })
+    : { data: null }
+
   const stats = [
     { label: "HCPs in view", value: hcpCount ?? 0 },
     { label: "Total visits logged", value: visitCount ?? 0 },
     { label: "Visits today", value: todayCount ?? 0 },
   ]
+
+  const teamRows = (team as TeamRow[] | null) ?? []
 
   return (
     <div className="space-y-6">
@@ -42,6 +65,42 @@ export default async function DashboardPage() {
           </Card>
         ))}
       </div>
+
+      {teamRows.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">
+              {teamRows.length === 1 ? "My coverage this month" : "Team coverage this month"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto rounded-md border">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b bg-muted/30">
+                    <th scope="col" className="text-left p-2 font-medium">Rep</th>
+                    <th scope="col" className="text-left p-2 font-medium">Visits today</th>
+                    <th scope="col" className="text-left p-2 font-medium">Visits this month</th>
+                    <th scope="col" className="text-left p-2 font-medium">HCP coverage</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {teamRows.map((row) => (
+                    <tr key={row.rep_id} className="border-b last:border-0">
+                      <td className="p-2">{row.email}</td>
+                      <td className="p-2">{row.visits_today}</td>
+                      <td className="p-2">{row.visits_this_month}</td>
+                      <td className="p-2">
+                        {row.visited_hcps}/{row.total_hcps} ({row.coverage_pct}%)
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }
