@@ -54,7 +54,7 @@ const DEMO_GROUPS: { label: string; accent: string; accounts: { role: string; em
     ],
   },
   {
-    label: "Field & Commercial",
+    label: "Sales & Marketing",
     accent: "var(--accent)",
     accounts: [
       { role: "Medical Representative", email: "rep1@medicalrep.dev", icon: Stethoscope },
