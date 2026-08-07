@@ -1,7 +1,23 @@
 import Image from "next/image"
-import { Stethoscope, ClipboardList, CalendarCheck2, TrendingUp, Radio } from "lucide-react"
+import {
+  Stethoscope,
+  ClipboardList,
+  CalendarCheck2,
+  TrendingUp,
+  Radio,
+  Users,
+  KeyRound,
+  Receipt,
+  ShoppingCart,
+  CalendarClock,
+  ClipboardCheck,
+  Boxes,
+  Map,
+  Sparkles,
+  type LucideIcon,
+} from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
-import { getCurrentOrgId } from "@/lib/org"
+import { getCurrentOrgId, getCurrentRole } from "@/lib/org"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 type TeamRow = {
@@ -14,6 +30,40 @@ type TeamRow = {
   coverage_pct: number
 }
 
+type Persona = "admin" | "manager" | "field" | "hr" | "finance" | "warehouse" | "general"
+
+const PERSONA_BY_ROLE: Record<string, Persona> = {
+  super_admin: "admin",
+  platform_owner: "admin",
+  company_admin: "admin",
+  national_sales_manager: "manager",
+  zonal_manager: "manager",
+  regional_manager: "manager",
+  area_sales_manager: "manager",
+  territory_manager: "manager",
+  medical_representative: "field",
+  key_account_manager: "field",
+  hr: "hr",
+  finance: "finance",
+  purchasing_officer: "finance",
+  warehouse_manager: "warehouse",
+  product_manager: "general",
+  marketing_manager: "general",
+  customer_support: "general",
+  auditor: "general",
+  guest: "general",
+}
+
+const PERSONA_ACCENT: Record<Persona, string> = {
+  admin: "var(--primary)",
+  manager: "var(--chart-1)",
+  field: "var(--chart-4)",
+  hr: "var(--chart-5)",
+  finance: "var(--accent)",
+  warehouse: "var(--chart-3)",
+  general: "var(--secondary-foreground)",
+}
+
 function currentPeriodMonth() {
   const d = new Date()
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`
@@ -22,6 +72,10 @@ function currentPeriodMonth() {
 export default async function DashboardPage() {
   const supabase = await createClient()
   const orgId = await getCurrentOrgId(supabase)
+  const role = await getCurrentRole(supabase)
+  const persona: Persona = (role && PERSONA_BY_ROLE[role.key]) || "general"
+  const periodMonth = currentPeriodMonth()
+  const pendingStatuses = ["submitted", "escalated"]
 
   const [{ count: hcpCount }, { count: visitCount }, { count: todayCount }] =
     await Promise.all([
@@ -34,7 +88,7 @@ export default async function DashboardPage() {
     ])
 
   const { data: team } = orgId
-    ? await supabase.rpc("team_dashboard", { p_org_id: orgId, p_period_month: currentPeriodMonth() })
+    ? await supabase.rpc("team_dashboard", { p_org_id: orgId, p_period_month: periodMonth })
     : { data: null }
 
   const teamRows = (team as TeamRow[] | null) ?? []
@@ -48,6 +102,62 @@ export default async function DashboardPage() {
     { label: "Visits today", value: todayCount ?? 0, icon: CalendarCheck2 },
     { label: "Avg. territory coverage", value: `${avgCoverage}%`, icon: TrendingUp },
   ]
+
+  let roleStats: { label: string; value: number | string; icon: LucideIcon }[] = []
+
+  if (persona === "admin") {
+    const [{ count: memberCount }, { count: roleCount }] = await Promise.all([
+      supabase.from("memberships").select("*", { count: "exact", head: true }),
+      supabase
+        .from("roles")
+        .select("*", { count: "exact", head: true })
+        .or(`organization_id.is.null,organization_id.eq.${orgId}`),
+    ])
+    roleStats = [
+      { label: "Org members", value: memberCount ?? 0, icon: Users },
+      { label: "Configured roles", value: roleCount ?? 0, icon: KeyRound },
+    ]
+  } else if (persona === "manager") {
+    const [{ count: pendingPlans }, { count: pendingClaims }] = await Promise.all([
+      supabase.from("tour_plans").select("*", { count: "exact", head: true }).in("status", pendingStatuses),
+      supabase.from("expense_claims").select("*", { count: "exact", head: true }).in("status", pendingStatuses),
+    ])
+    roleStats = [
+      { label: "Tour plans awaiting approval", value: pendingPlans ?? 0, icon: Map },
+      { label: "Expense claims awaiting approval", value: pendingClaims ?? 0, icon: Receipt },
+    ]
+  } else if (persona === "hr") {
+    const [{ count: pendingLeave }, { count: pendingReviews }] = await Promise.all([
+      supabase.from("leave_requests").select("*", { count: "exact", head: true }).in("status", pendingStatuses),
+      supabase.from("performance_reviews").select("*", { count: "exact", head: true }).eq("status", "submitted"),
+    ])
+    roleStats = [
+      { label: "Leave requests awaiting approval", value: pendingLeave ?? 0, icon: CalendarClock },
+      { label: "Reviews awaiting acknowledgement", value: pendingReviews ?? 0, icon: ClipboardCheck },
+    ]
+  } else if (persona === "finance") {
+    const [{ count: pendingClaims }, { count: pendingOrders }] = await Promise.all([
+      supabase.from("expense_claims").select("*", { count: "exact", head: true }).in("status", pendingStatuses),
+      supabase.from("orders").select("*", { count: "exact", head: true }).in("status", pendingStatuses),
+    ])
+    roleStats = [
+      { label: "Expense claims awaiting approval", value: pendingClaims ?? 0, icon: Receipt },
+      { label: "Orders awaiting approval", value: pendingOrders ?? 0, icon: ShoppingCart },
+    ]
+  } else if (persona === "warehouse") {
+    const { count: allocationCount } = await supabase
+      .from("sample_allocations")
+      .select("*", { count: "exact", head: true })
+      .eq("period_month", periodMonth)
+    roleStats = [{ label: "Sample allocations this month", value: allocationCount ?? 0, icon: Boxes }]
+  } else if (persona === "field" && orgId) {
+    const { data: recommended } = await supabase.rpc("next_best_actions", { p_org_id: orgId, p_limit: 100 })
+    roleStats = [
+      { label: "AI-recommended visits pending", value: (recommended as unknown[] | null)?.length ?? 0, icon: Sparkles },
+    ]
+  }
+
+  const accent = PERSONA_ACCENT[persona]
 
   return (
     <div className="space-y-6">
@@ -84,7 +194,7 @@ export default async function DashboardPage() {
           <div>
             <div className="inline-flex items-center gap-1.5 rounded-full bg-white/10 backdrop-blur px-2.5 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.15em] text-white/85 mb-2">
               <Radio className="size-3 animate-pulse" aria-hidden />
-              Live Field Force Intelligence
+              {role ? `${role.name} View` : "Live Field Force Intelligence"}
             </div>
             <h1 className="text-3xl sm:text-5xl font-semibold tracking-tight">Dashboard</h1>
             <p className="text-white/80 text-sm sm:text-base mt-2 max-w-xl">
@@ -118,6 +228,32 @@ export default async function DashboardPage() {
           </Card>
         ))}
       </div>
+
+      {roleStats.length > 0 && (
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-wider text-primary mb-3">
+            {role?.name ?? "Your"} focus
+          </p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {roleStats.map((stat) => (
+              <Card key={stat.label}>
+                <CardContent className="pt-5 flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
+                    <p className="text-3xl font-semibold tracking-tight text-foreground mt-1">{stat.value}</p>
+                  </div>
+                  <div
+                    className="shrink-0 grid place-items-center size-10 rounded-lg"
+                    style={{ background: `color-mix(in oklch, ${accent}, transparent 88%)`, color: accent }}
+                  >
+                    <stat.icon className="size-5" aria-hidden />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
 
       {teamRows.length > 0 && (
         <Card>
