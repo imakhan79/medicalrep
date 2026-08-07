@@ -2,6 +2,7 @@ import { ClipboardCheck } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { getCurrentOrgId } from "@/lib/org"
 import { PageHeader } from "@/components/page-header"
+import { ExportCsvButton } from "@/components/export-csv-button"
 import { NewReviewForm } from "./new-review-form"
 import { AcknowledgeButton } from "./acknowledge-button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -17,7 +18,7 @@ export default async function PerformancePage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  const [{ data: members }, { data: reviews, error }, { data: canCreate }] = await Promise.all([
+  const [{ data: members }, { data: reviews, error }, { data: canCreate }, { data: canExport }] = await Promise.all([
     supabase.rpc("list_org_members", { p_org_id: orgId }),
     supabase
       .from("performance_reviews")
@@ -25,6 +26,7 @@ export default async function PerformancePage() {
       .order("created_at", { ascending: false })
       .limit(LIST_LIMIT),
     supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "performance_reviews", p_action: "create" }),
+    supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "performance_reviews", p_action: "export" }),
   ])
 
   const memberList = (members as { user_id: string; email: string }[] | null) ?? []
@@ -47,8 +49,19 @@ export default async function PerformancePage() {
       )}
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-base">All reviews</CardTitle>
+          {canExport && (
+            <ExportCsvButton
+              rows={(reviews ?? []).map((r) => ({
+                rep: emailFor(r.rep_id),
+                review_period: r.review_period,
+                rating: r.rating,
+                status: r.status,
+              }))}
+              filename="performance-reviews.csv"
+            />
+          )}
         </CardHeader>
         <CardContent>
           <ul className="divide-y rounded-md border" aria-label="Performance reviews">

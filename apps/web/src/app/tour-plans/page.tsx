@@ -3,6 +3,7 @@ import { Map } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { getCurrentOrgId } from "@/lib/org"
 import { PageHeader } from "@/components/page-header"
+import { ExportCsvButton } from "@/components/export-csv-button"
 import { NewTourPlanForm } from "./new-tour-plan-form"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -19,9 +20,12 @@ const LIST_LIMIT = 200
 export default async function TourPlansPage() {
   const supabase = await createClient()
   const orgId = await getCurrentOrgId(supabase)
-  const { data: canCreate } = orgId
-    ? await supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "tour_plans", p_action: "create" })
-    : { data: false }
+  const [{ data: canCreate }, { data: canExport }] = orgId
+    ? await Promise.all([
+        supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "tour_plans", p_action: "create" }),
+        supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "tour_plans", p_action: "export" }),
+      ])
+    : [{ data: false }, { data: false }]
 
   const { data: territories } = await supabase.from("territories").select("id, name").order("name")
 
@@ -48,8 +52,19 @@ export default async function TourPlansPage() {
       )}
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-base">All tour plans</CardTitle>
+          {canExport && (
+            <ExportCsvButton
+              rows={(plans ?? []).map((p) => ({
+                title: p.title,
+                period_start: p.period_start,
+                period_end: p.period_end,
+                status: p.status,
+              }))}
+              filename="tour-plans.csv"
+            />
+          )}
         </CardHeader>
         <CardContent>
           <ul className="divide-y rounded-md border" aria-label="Tour plans">

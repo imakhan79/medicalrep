@@ -2,7 +2,9 @@ import { Target } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { getCurrentOrgId } from "@/lib/org"
 import { PageHeader } from "@/components/page-header"
+import { ExportCsvButton } from "@/components/export-csv-button"
 import { NewTargetForm } from "./new-target-form"
+import { TargetActions } from "./target-actions"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 type OrgMember = { user_id: string; email: string }
@@ -26,15 +28,42 @@ export default async function TargetsPage() {
   nextMonth.setMonth(nextMonth.getMonth() + 1)
   const monthEnd = nextMonth.toISOString().slice(0, 10)
 
-  const [{ data: canCreate }, { data: targets, error }, { data: members }] = await Promise.all([
+  const [{ data: canCreate }, { data: canExport }, { data: targets, error }, { data: members }] = await Promise.all([
     supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "targets", p_action: "create" }),
+    supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "targets", p_action: "export" }),
     supabase
       .from("targets")
-      .select("id, rep_id, metric_type, target_value, period_month, notes")
+      .select("id, rep_id, territory_id, metric_type, target_value, period_month, notes")
       .eq("period_month", periodMonth)
       .order("created_at", { ascending: false }),
     supabase.rpc("list_org_members", { p_org_id: orgId }),
   ])
+
+  const scopeKeys = [...new Set((targets ?? []).map((t) => `${t.territory_id ?? ""}:${t.rep_id}`))]
+  const permissionsByScope = new Map(
+    await Promise.all(
+      scopeKeys.map(async (key) => {
+        const [territoryId, repId] = key.split(":")
+        const [{ data: canEdit }, { data: canDelete }] = await Promise.all([
+          supabase.rpc("can_access_row", {
+            p_org_id: orgId,
+            p_resource_key: "targets",
+            p_action: "edit",
+            p_territory_id: territoryId || null,
+            p_owner_id: repId,
+          }),
+          supabase.rpc("can_access_row", {
+            p_org_id: orgId,
+            p_resource_key: "targets",
+            p_action: "delete",
+            p_territory_id: territoryId || null,
+            p_owner_id: repId,
+          }),
+        ])
+        return [key, { canEdit: Boolean(canEdit), canDelete: Boolean(canDelete) }] as const
+      })
+    )
+  )
 
   const repIds = [...new Set((targets ?? []).map((t) => t.rep_id))]
   const { data: visits } = repIds.length
@@ -67,14 +96,25 @@ export default async function TargetsPage() {
       )}
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-base">{periodMonth.slice(0, 7)} targets</CardTitle>
+          {canExport && (
+            <ExportCsvButton
+              rows={(targets ?? []).map((t) => ({
+                rep: emailFor(t.rep_id),
+                metric_type: t.metric_type,
+                target_value: Number(t.target_value),
+              }))}
+              filename="targets.csv"
+            />
+          )}
         </CardHeader>
         <CardContent>
           <ul className="divide-y rounded-md border text-sm" aria-label="Targets">
             {targets?.map((t) => {
               const achieved = t.metric_type === "visit_count" ? visitCounts.get(t.rep_id) ?? 0 : null
               const pct = achieved !== null ? Math.min(100, Math.round((achieved / Number(t.target_value)) * 100)) : null
+              const perms = permissionsByScope.get(`${t.territory_id ?? ""}:${t.rep_id}`)
               return (
                 <li key={t.id} className="p-3">
                   <div className="flex items-center justify-between">
@@ -94,6 +134,12 @@ export default async function TargetsPage() {
                       />
                     </div>
                   )}
+                  <TargetActions
+                    targetId={t.id}
+                    targetValue={Number(t.target_value)}
+                    canEdit={perms?.canEdit ?? false}
+                    canDelete={perms?.canDelete ?? false}
+                  />
                 </li>
               )
             })}

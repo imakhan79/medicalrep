@@ -2,6 +2,7 @@ import { Stethoscope } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { getCurrentOrgId } from "@/lib/org"
 import { PageHeader } from "@/components/page-header"
+import { ExportCsvButton } from "@/components/export-csv-button"
 import { HcpCreateForm } from "./hcp-create-form"
 
 const LIST_LIMIT = 200
@@ -9,9 +10,12 @@ const LIST_LIMIT = 200
 export default async function HcpsPage() {
   const supabase = await createClient()
   const orgId = await getCurrentOrgId(supabase)
-  const { data: canCreate } = orgId
-    ? await supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "hcps", p_action: "create" })
-    : { data: false }
+  const [{ data: canCreate }, { data: canExport }] = orgId
+    ? await Promise.all([
+        supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "hcps", p_action: "create" }),
+        supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "hcps", p_action: "export" }),
+      ])
+    : [{ data: false }, { data: false }]
   const { data: hcps, error } = await supabase
     .from("hcps")
     .select("id, first_name, last_name, specialty, tier, consent_status")
@@ -32,6 +36,21 @@ export default async function HcpsPage() {
         <p role="alert" className="text-destructive text-sm">
           Could not load HCPs: {error.message}
         </p>
+      )}
+
+      {canExport && (
+        <div className="flex justify-end">
+          <ExportCsvButton
+            rows={(hcps ?? []).map((h) => ({
+              first_name: h.first_name,
+              last_name: h.last_name,
+              specialty: h.specialty,
+              tier: h.tier,
+              consent_status: h.consent_status,
+            }))}
+            filename="hcps.csv"
+          />
+        </div>
       )}
 
       <ul className="divide-y rounded-md border" aria-label="HCP list">

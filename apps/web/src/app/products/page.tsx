@@ -2,6 +2,7 @@ import { Package } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { getCurrentOrgId } from "@/lib/org"
 import { PageHeader } from "@/components/page-header"
+import { ExportCsvButton } from "@/components/export-csv-button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ProductForm } from "./product-form"
 
@@ -12,8 +13,9 @@ export default async function ProductsPage() {
   const orgId = await getCurrentOrgId(supabase)
   if (!orgId) return <p className="text-muted-foreground text-sm">Sign in with an organization membership.</p>
 
-  const [{ data: canEdit }, { data: products, error }] = await Promise.all([
+  const [{ data: canEdit }, { data: canExport }, { data: products, error }] = await Promise.all([
     supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "products", p_action: "edit" }),
+    supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "products", p_action: "export" }),
     supabase.from("products").select("id, name, sku").order("name").limit(LIST_LIMIT),
   ])
 
@@ -34,8 +36,14 @@ export default async function ProductsPage() {
       )}
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-base">All products</CardTitle>
+          {canExport && (
+            <ExportCsvButton
+              rows={(products ?? []).map((p) => ({ name: p.name, sku: p.sku }))}
+              filename="products.csv"
+            />
+          )}
         </CardHeader>
         <CardContent>
           <ul className="divide-y rounded-md border" aria-label="Products">

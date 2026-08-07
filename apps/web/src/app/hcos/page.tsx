@@ -2,6 +2,7 @@ import { Building2 } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { getCurrentOrgId } from "@/lib/org"
 import { PageHeader } from "@/components/page-header"
+import { ExportCsvButton } from "@/components/export-csv-button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { HcoForm } from "./hco-form"
 
@@ -12,8 +13,9 @@ export default async function HcosPage() {
   const orgId = await getCurrentOrgId(supabase)
   if (!orgId) return <p className="text-muted-foreground text-sm">Sign in with an organization membership.</p>
 
-  const [{ data: canEdit }, { data: hcos, error }, { data: territories }] = await Promise.all([
+  const [{ data: canEdit }, { data: canExport }, { data: hcos, error }, { data: territories }] = await Promise.all([
     supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "hcos", p_action: "edit" }),
+    supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "hcos", p_action: "export" }),
     supabase
       .from("hcos")
       .select("id, name, type, address, territory_id, territories(name)")
@@ -39,8 +41,20 @@ export default async function HcosPage() {
       )}
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-base">All HCOs</CardTitle>
+          {canExport && (
+            <ExportCsvButton
+              rows={(hcos ?? []).map((h) => ({
+                name: h.name,
+                type: h.type,
+                address: h.address,
+                // @ts-expect-error -- joined relation shape from PostgREST
+                territory: h.territories?.name ?? "",
+              }))}
+              filename="hcos.csv"
+            />
+          )}
         </CardHeader>
         <CardContent>
           <ul className="divide-y rounded-md border" aria-label="Healthcare organizations">

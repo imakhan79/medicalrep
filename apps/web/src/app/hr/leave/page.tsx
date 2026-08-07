@@ -2,6 +2,7 @@ import { CalendarClock } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { getCurrentOrgId } from "@/lib/org"
 import { PageHeader } from "@/components/page-header"
+import { ExportCsvButton } from "@/components/export-csv-button"
 import { NewLeaveForm } from "./new-leave-form"
 import { LeaveActions } from "./leave-actions"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -25,11 +26,10 @@ export default async function LeavePage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  const { data: canCreate } = await supabase.rpc("can_access_row", {
-    p_org_id: orgId,
-    p_resource_key: "leave_requests",
-    p_action: "create",
-  })
+  const [{ data: canCreate }, { data: canExport }] = await Promise.all([
+    supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "leave_requests", p_action: "create" }),
+    supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "leave_requests", p_action: "export" }),
+  ])
 
   const { data: requests, error } = await supabase
     .from("leave_requests")
@@ -77,8 +77,20 @@ export default async function LeavePage() {
       )}
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-base">All leave requests</CardTitle>
+          {canExport && (
+            <ExportCsvButton
+              rows={(requests ?? []).map((r) => ({
+                leave_type: r.leave_type,
+                start_date: r.start_date,
+                end_date: r.end_date,
+                status: r.status,
+                reason: r.reason,
+              }))}
+              filename="leave-requests.csv"
+            />
+          )}
         </CardHeader>
         <CardContent>
           <ul className="divide-y rounded-md border" aria-label="Leave requests">

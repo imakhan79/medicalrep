@@ -2,7 +2,9 @@ import { Package } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { getCurrentOrgId } from "@/lib/org"
 import { PageHeader } from "@/components/page-header"
+import { ExportCsvButton } from "@/components/export-csv-button"
 import { NewAllocationForm } from "./new-allocation-form"
+import { DeleteAllocationButton } from "./delete-allocation-button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 type Balance = {
@@ -29,10 +31,12 @@ export default async function SampleInventoryPage() {
 
   const periodMonth = currentPeriodMonth()
 
-  const [{ data: myBalances }, { data: canAssign }, { data: allocations }, { data: members }, { data: products }] =
+  const [{ data: myBalances }, { data: canAssign }, { data: canDelete }, { data: canExport }, { data: allocations }, { data: members }, { data: products }] =
     await Promise.all([
       supabase.rpc("my_sample_balances", { p_org_id: orgId, p_period_month: periodMonth }),
       supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "sample_inventory", p_action: "assign" }),
+      supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "sample_inventory", p_action: "delete" }),
+      supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "sample_inventory", p_action: "export" }),
       supabase
         .from("sample_allocations")
         .select("id, rep_id, product_id, allocated_qty, period_month, notes, products(name)")
@@ -81,22 +85,41 @@ export default async function SampleInventoryPage() {
             periodMonth={periodMonth}
             members={members ?? []}
             products={products ?? []}
+            existingAllocations={(allocations ?? []).map((a) => ({
+              rep_id: a.rep_id,
+              product_id: a.product_id,
+              allocated_qty: a.allocated_qty,
+            }))}
           />
 
           <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="text-base">All allocations this month</CardTitle>
+              {canExport && (
+                <ExportCsvButton
+                  rows={(allocations ?? []).map((a) => ({
+                    rep: (members as OrgMember[] | null)?.find((m) => m.user_id === a.rep_id)?.email ?? a.rep_id,
+                    // @ts-expect-error -- joined relation shape from PostgREST
+                    product: a.products?.name ?? "",
+                    allocated_qty: a.allocated_qty,
+                  }))}
+                  filename="sample-allocations.csv"
+                />
+              )}
             </CardHeader>
             <CardContent>
               <ul className="divide-y rounded-md border text-sm" aria-label="All allocations">
                 {allocations?.map((a) => (
-                  <li key={a.id} className="p-2 flex items-center justify-between">
+                  <li key={a.id} className="p-2 flex items-center justify-between gap-3">
                     <span>
                       {(members as OrgMember[] | null)?.find((m) => m.user_id === a.rep_id)?.email ?? a.rep_id} —{" "}
                       {/* @ts-expect-error -- joined relation shape from PostgREST */}
                       {a.products?.name}
                     </span>
-                    <span className="text-muted-foreground">{a.allocated_qty} units</span>
+                    <span className="flex items-center gap-3">
+                      <span className="text-muted-foreground">{a.allocated_qty} units</span>
+                      {canDelete && <DeleteAllocationButton allocationId={a.id} />}
+                    </span>
                   </li>
                 ))}
                 {allocations?.length === 0 && (

@@ -2,6 +2,7 @@ import { History } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { getCurrentOrgId } from "@/lib/org"
 import { PageHeader } from "@/components/page-header"
+import { ExportCsvButton } from "@/components/export-csv-button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -34,11 +35,10 @@ export default async function AuditLogPage() {
   const orgId = await getCurrentOrgId(supabase)
   if (!orgId) return <p className="text-muted-foreground text-sm">Sign in with an organization membership.</p>
 
-  const { data: canView } = await supabase.rpc("can_access_row", {
-    p_org_id: orgId,
-    p_resource_key: "audit_log",
-    p_action: "view",
-  })
+  const [{ data: canView }, { data: canExport }] = await Promise.all([
+    supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "audit_log", p_action: "view" }),
+    supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "audit_log", p_action: "export" }),
+  ])
 
   if (!canView) {
     return (
@@ -77,8 +77,20 @@ export default async function AuditLogPage() {
       )}
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-base">Recent activity</CardTitle>
+          {canExport && (
+            <ExportCsvButton
+              rows={rows.map((row) => ({
+                time: row.created_at,
+                actor: emailFor(row.actor_id),
+                table: humanizeTable(row.table_name),
+                action: row.action,
+                row_id: row.row_id,
+              }))}
+              filename="audit-log.csv"
+            />
+          )}
         </CardHeader>
         <CardContent>
           <ul className="divide-y rounded-md border" aria-label="Audit log entries">

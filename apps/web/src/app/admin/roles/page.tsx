@@ -5,6 +5,7 @@ import Link from "next/link"
 import { PageHeader } from "@/components/page-header"
 import { NewRoleForm } from "./new-role-form"
 import { CloneRoleButton } from "./clone-role-button"
+import { DeleteRoleButton } from "./delete-role-button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default async function RolesAdminPage() {
@@ -60,7 +61,7 @@ export default async function RolesAdminPage() {
       <NewRoleForm orgId={orgId} />
 
       <RoleList title="System Roles" roles={systemRoles} cloneable orgId={orgId} />
-      <RoleList title={`Custom Roles`} roles={customRoles} editable />
+      <RoleList title={`Custom Roles`} roles={customRoles} editable deletable />
     </div>
   )
 }
@@ -70,12 +71,14 @@ function RoleList({
   roles,
   editable,
   cloneable,
+  deletable,
   orgId,
 }: {
   title: string
   roles: { id: string; key: string; name: string; description: string | null }[]
   editable?: boolean
   cloneable?: boolean
+  deletable?: boolean
   orgId?: string
 }) {
   return (
@@ -104,6 +107,7 @@ function RoleList({
                 </Link>
               )}
               {cloneable && orgId && <CloneRoleButton roleId={role.id} orgId={orgId} />}
+              {deletable && <DeleteRoleButton roleId={role.id} name={role.name} />}
             </li>
           ))}
           {roles.length === 0 && (

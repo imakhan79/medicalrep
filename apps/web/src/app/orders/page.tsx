@@ -3,6 +3,7 @@ import { ShoppingCart } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { getCurrentOrgId } from "@/lib/org"
 import { PageHeader } from "@/components/page-header"
+import { ExportCsvButton } from "@/components/export-csv-button"
 import { NewOrderForm } from "./new-order-form"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -19,9 +20,12 @@ const LIST_LIMIT = 200
 export default async function OrdersPage() {
   const supabase = await createClient()
   const orgId = await getCurrentOrgId(supabase)
-  const { data: canCreate } = orgId
-    ? await supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "orders", p_action: "create" })
-    : { data: false }
+  const [{ data: canCreate }, { data: canExport }] = orgId
+    ? await Promise.all([
+        supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "orders", p_action: "create" }),
+        supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "orders", p_action: "export" }),
+      ])
+    : [{ data: false }, { data: false }]
 
   const { data: partners } = await supabase.from("channel_partners").select("id, name").order("name")
 
@@ -48,8 +52,20 @@ export default async function OrdersPage() {
       )}
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-base">All orders</CardTitle>
+          {canExport && (
+            <ExportCsvButton
+              rows={(orders ?? []).map((o) => ({
+                order_date: o.order_date,
+                status: o.status,
+                fulfillment_status: o.fulfillment_status,
+                // @ts-expect-error -- joined relation shape from PostgREST
+                partner: o.channel_partners?.name ?? "",
+              }))}
+              filename="orders.csv"
+            />
+          )}
         </CardHeader>
         <CardContent>
           <ul className="divide-y rounded-md border" aria-label="Orders">

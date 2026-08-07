@@ -2,6 +2,7 @@ import { Handshake } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { getCurrentOrgId } from "@/lib/org"
 import { PageHeader } from "@/components/page-header"
+import { ExportCsvButton } from "@/components/export-csv-button"
 import { ChannelPartnerForm } from "./channel-partner-form"
 
 const LIST_LIMIT = 200
@@ -9,9 +10,12 @@ const LIST_LIMIT = 200
 export default async function ChannelPartnersPage() {
   const supabase = await createClient()
   const orgId = await getCurrentOrgId(supabase)
-  const { data: canCreate } = orgId
-    ? await supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "channel_partners", p_action: "create" })
-    : { data: false }
+  const [{ data: canCreate }, { data: canExport }] = orgId
+    ? await Promise.all([
+        supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "channel_partners", p_action: "create" }),
+        supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "channel_partners", p_action: "export" }),
+      ])
+    : [{ data: false }, { data: false }]
   const { data: partners, error } = await supabase
     .from("channel_partners")
     .select("id, name, type, contact_phone, contact_email")
@@ -32,6 +36,20 @@ export default async function ChannelPartnersPage() {
         <p role="alert" className="text-destructive text-sm">
           Could not load channel partners: {error.message}
         </p>
+      )}
+
+      {canExport && (
+        <div className="flex justify-end">
+          <ExportCsvButton
+            rows={(partners ?? []).map((p) => ({
+              name: p.name,
+              type: p.type,
+              contact_phone: p.contact_phone,
+              contact_email: p.contact_email,
+            }))}
+            filename="channel-partners.csv"
+          />
+        </div>
       )}
 
       <ul className="divide-y rounded-md border" aria-label="Channel partners">

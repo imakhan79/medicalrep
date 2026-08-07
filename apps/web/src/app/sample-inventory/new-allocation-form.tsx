@@ -10,17 +10,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 type Member = { user_id: string; email: string }
 type Product = { id: string; name: string }
+type Allocation = { rep_id: string; product_id: string; allocated_qty: number }
 
 export function NewAllocationForm({
   orgId,
   periodMonth,
   members,
   products,
+  existingAllocations,
 }: {
   orgId: string
   periodMonth: string
   members: Member[]
   products: Product[]
+  existingAllocations: Allocation[]
 }) {
   const router = useRouter()
   const [repId, setRepId] = useState(members[0]?.user_id ?? "")
@@ -28,6 +31,14 @@ export function NewAllocationForm({
   const [qty, setQty] = useState("")
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const existing = existingAllocations.find((a) => a.rep_id === repId && a.product_id === productId)
+
+  // Pre-fill the quantity when an allocation for this rep/product already exists this
+  // period, so submitting doesn't silently overwrite it without the current value visible.
+  function findExisting(rep: string, product: string) {
+    return existingAllocations.find((a) => a.rep_id === rep && a.product_id === product)
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -59,6 +70,11 @@ export function NewAllocationForm({
     <Card>
       <CardHeader>
         <CardTitle className="text-base">Assign allocation ({periodMonth.slice(0, 7)})</CardTitle>
+        {existing && (
+          <p className="text-sm text-warning">
+            Editing existing allocation of {existing.allocated_qty} — saving will overwrite it.
+          </p>
+        )}
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="grid gap-4 sm:grid-cols-4 sm:items-end">
@@ -67,7 +83,12 @@ export function NewAllocationForm({
             <select
               id="alloc-rep"
               value={repId}
-              onChange={(e) => setRepId(e.target.value)}
+              onChange={(e) => {
+                const nextRepId = e.target.value
+                setRepId(nextRepId)
+                const match = findExisting(nextRepId, productId)
+                setQty(match ? String(match.allocated_qty) : "")
+              }}
               className="border rounded-md h-9 px-3 text-sm bg-background"
               required
             >
@@ -83,7 +104,12 @@ export function NewAllocationForm({
             <select
               id="alloc-product"
               value={productId}
-              onChange={(e) => setProductId(e.target.value)}
+              onChange={(e) => {
+                const nextProductId = e.target.value
+                setProductId(nextProductId)
+                const match = findExisting(repId, nextProductId)
+                setQty(match ? String(match.allocated_qty) : "")
+              }}
               className="border rounded-md h-9 px-3 text-sm bg-background"
               required
             >

@@ -7,6 +7,7 @@ import { LiveMap } from "./live-map"
 import { AlertActions } from "./alert-actions"
 import { SosActions } from "./sos-actions"
 import { RealtimeRefresh } from "./realtime-refresh"
+import { ExportCsvButton } from "@/components/export-csv-button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default async function FieldTrackingPage() {
@@ -17,10 +18,11 @@ export default async function FieldTrackingPage() {
     return <p className="text-muted-foreground text-sm">Sign in with an organization membership.</p>
   }
 
-  const [{ data: canCreate }, { data: canEdit }, { data: locations }, { data: members }, { data: geofences }, { data: alerts }, { data: sosIncidents }, { data: policy }] =
+  const [{ data: canCreate }, { data: canEdit }, { data: canExport }, { data: locations }, { data: members }, { data: geofences }, { data: alerts }, { data: sosIncidents }, { data: policy }] =
     await Promise.all([
       supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "field_tracking", p_action: "create" }),
       supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "field_tracking", p_action: "edit" }),
+      supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "field_tracking", p_action: "export" }),
       supabase.from("live_locations").select("rep_id, latitude, longitude, status, recorded_at"),
       supabase.rpc("list_org_members", { p_org_id: orgId }),
       supabase.from("geofences").select("id, name, latitude, longitude, radius_meters"),
@@ -99,8 +101,20 @@ export default async function FieldTrackingPage() {
       </Card>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-base">Active alerts</CardTitle>
+          {canExport && (
+            <ExportCsvButton
+              rows={(alerts ?? []).map((a) => ({
+                alert_type: a.alert_type,
+                severity: a.severity,
+                message: a.message,
+                status: a.status,
+                created_at: a.created_at,
+              }))}
+              filename="tracking-alerts.csv"
+            />
+          )}
         </CardHeader>
         <CardContent>
           <ul className="divide-y rounded-md border text-sm" aria-label="Active tracking alerts">
