@@ -18,7 +18,8 @@ insert into public.resources (key, name, module) values
   ('sample_inventory', 'Sample Inventory', 'inventory'),
   ('orders', 'Orders', 'inventory'),
   ('reports', 'Reports & Dashboards', 'analytics'),
-  ('audit_log', 'Audit Log', 'compliance')
+  ('audit_log', 'Audit Log', 'compliance'),
+  ('field_tracking', 'Field Tracking (Live Location & Routes)', 'tracking')
 on conflict (key) do nothing;
 
 -- Full action catalog per resource (the "menu" of what's possible; role_permissions decides what's granted).
@@ -78,12 +79,14 @@ begin
       ('super_admin', 'orders', array['view','create','edit','delete','approve','reject','export'], 'platform'),
       ('super_admin', 'reports', array['view','export'], 'platform'),
       ('super_admin', 'audit_log', array['view','export'], 'platform'),
+      ('super_admin', 'field_tracking', array['view','edit','export','configure'], 'platform'),
 
       ('platform_owner', 'organizations', array['view','create','edit','delete','configure'], 'platform'),
       ('platform_owner', 'roles', array['view','create','edit','delete','configure'], 'platform'),
       ('platform_owner', 'memberships', array['view','create','edit','delete','assign'], 'platform'),
       ('platform_owner', 'reports', array['view','export'], 'platform'),
       ('platform_owner', 'audit_log', array['view','export'], 'platform'),
+      ('platform_owner', 'field_tracking', array['view','edit','export','configure'], 'platform'),
 
       -- Full control within one org
       ('company_admin', 'organizations', array['view','edit'], 'org'),
@@ -102,6 +105,7 @@ begin
       ('company_admin', 'orders', array['view','create','edit','delete','approve','reject','export'], 'org'),
       ('company_admin', 'reports', array['view','export'], 'org'),
       ('company_admin', 'audit_log', array['view','export'], 'org'),
+      ('company_admin', 'field_tracking', array['view','edit','export','configure'], 'org'),
 
       ('national_sales_manager', 'hcos', array['view'], 'org'),
       ('national_sales_manager', 'hcps', array['view','export'], 'org'),
@@ -111,6 +115,7 @@ begin
       ('national_sales_manager', 'tour_plans', array['view','approve','reject'], 'org'),
       ('national_sales_manager', 'expense_claims', array['view','approve','reject','export'], 'org'),
       ('national_sales_manager', 'reports', array['view','export'], 'org'),
+      ('national_sales_manager', 'field_tracking', array['view','edit','export'], 'org'),
       ('national_sales_manager', 'products', array['view'], 'org'),
       ('national_sales_manager', 'memberships', array['view'], 'org'),
 
@@ -125,6 +130,7 @@ begin
       ('zonal_manager', 'expense_claims', array['view','approve','reject'], 'hierarchy'),
       ('zonal_manager', 'sample_inventory', array['view','assign'], 'hierarchy'),
       ('zonal_manager', 'reports', array['view','export'], 'hierarchy'),
+      ('zonal_manager', 'field_tracking', array['view','edit','export'], 'hierarchy'),
 
       ('regional_manager', 'hcos', array['view'], 'hierarchy'),
       ('regional_manager', 'hcps', array['view','edit'], 'hierarchy'),
@@ -135,6 +141,7 @@ begin
       ('regional_manager', 'expense_claims', array['view','approve','reject'], 'hierarchy'),
       ('regional_manager', 'sample_inventory', array['view','assign'], 'hierarchy'),
       ('regional_manager', 'reports', array['view','export'], 'hierarchy'),
+      ('regional_manager', 'field_tracking', array['view','edit','export'], 'hierarchy'),
 
       ('area_sales_manager', 'hcos', array['view'], 'hierarchy'),
       ('area_sales_manager', 'hcps', array['view','edit'], 'hierarchy'),
@@ -144,6 +151,7 @@ begin
       ('area_sales_manager', 'sample_inventory', array['view','assign'], 'hierarchy'),
       ('area_sales_manager', 'reports', array['view'], 'hierarchy'),
       ('area_sales_manager', 'targets', array['view','edit'], 'hierarchy'),
+      ('area_sales_manager', 'field_tracking', array['view','edit'], 'hierarchy'),
 
       ('territory_manager', 'hcos', array['view'], 'territory'),
       ('territory_manager', 'channel_partners', array['view'], 'territory'),
@@ -153,6 +161,7 @@ begin
       ('territory_manager', 'targets', array['view'], 'territory'),
       ('territory_manager', 'sample_inventory', array['view','assign'], 'territory'),
       ('territory_manager', 'reports', array['view'], 'territory'),
+      ('territory_manager', 'field_tracking', array['view','edit'], 'territory'),
 
       -- Individual field roles
       ('medical_representative', 'hcos', array['view'], 'territory'),
@@ -165,6 +174,7 @@ begin
       ('medical_representative', 'sample_inventory', array['view'], 'own'),
       ('medical_representative', 'targets', array['view'], 'own'),
       ('medical_representative', 'reports', array['view'], 'own'),
+      ('medical_representative', 'field_tracking', array['view','create','edit'], 'own'),
 
       ('key_account_manager', 'hcos', array['view','edit'], 'territory'),
       ('key_account_manager', 'hcps', array['view','edit'], 'territory'),
@@ -176,6 +186,7 @@ begin
       ('key_account_manager', 'channel_partners', array['view','edit'], 'territory'),
       ('key_account_manager', 'targets', array['view'], 'own'),
       ('key_account_manager', 'reports', array['view'], 'own'),
+      ('key_account_manager', 'field_tracking', array['view','create','edit'], 'own'),
 
       -- Functional / back-office roles
       ('product_manager', 'products', array['view','create','edit','delete','configure'], 'org'),
@@ -223,6 +234,7 @@ begin
       ('auditor', 'orders', array['view','export'], 'org'),
       ('auditor', 'reports', array['view','export'], 'org'),
       ('auditor', 'audit_log', array['view','export'], 'org'),
+      ('auditor', 'field_tracking', array['view','export'], 'org'),
 
       ('guest', 'hcos', array['view'], 'org'),
       ('guest', 'products', array['view'], 'org')
@@ -525,4 +537,15 @@ on conflict (id) do nothing;
 insert into public.order_items (id, order_id, product_id, quantity, unit_price) values
   ('00000000-0000-0000-0000-000000000087', '00000000-0000-0000-0000-000000000085', '00000000-0000-0000-0000-000000000041', 50, 18.00),
   ('00000000-0000-0000-0000-000000000088', '00000000-0000-0000-0000-000000000086', '00000000-0000-0000-0000-000000000042', 200, 6.25)
+on conflict (id) do nothing;
+
+-- Field tracking: policy defaults + demo geofences around the seeded HCOs.
+insert into public.tracking_policies (organization_id, tracking_interval_seconds, min_accuracy_meters, max_plausible_speed_kmh, stationary_alert_minutes, offline_alert_minutes, location_retention_days) values
+  ('00000000-0000-0000-0000-000000000001', 30, 100, 180, 60, 15, 180)
+on conflict (organization_id) do nothing;
+
+insert into public.geofences (id, organization_id, entity_type, entity_id, name, latitude, longitude, radius_meters, territory_id) values
+  ('00000000-0000-0000-0000-0000000000d1', '00000000-0000-0000-0000-000000000001', 'hco', '00000000-0000-0000-0000-000000000020', 'City General Hospital', 40.7580, -73.9855, 200, '00000000-0000-0000-0000-000000000010'),
+  ('00000000-0000-0000-0000-0000000000d2', '00000000-0000-0000-0000-000000000001', 'hco', '00000000-0000-0000-0000-000000000021', 'Riverside Clinic', 40.7489, -73.9680, 150, '00000000-0000-0000-0000-000000000010'),
+  ('00000000-0000-0000-0000-0000000000d3', '00000000-0000-0000-0000-000000000001', 'hco', '00000000-0000-0000-0000-000000000022', 'Southside Medical Center', 40.6892, -74.0445, 250, '00000000-0000-0000-0000-000000000011')
 on conflict (id) do nothing;
