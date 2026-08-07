@@ -8,6 +8,8 @@ export default async function VisitsPage() {
     .select("id, first_name, last_name")
     .order("last_name")
 
+  const { data: products } = await supabase.from("products").select("id, name").order("name")
+
   const { data: visits, error } = await supabase
     .from("visits")
     .select("id, hcp_id, visited_at, objective, outcome_notes, hcps(first_name, last_name)")
@@ -23,7 +25,7 @@ export default async function VisitsPage() {
         </p>
       </div>
 
-      <VisitCheckinForm hcps={hcps ?? []} />
+      <VisitCheckinForm hcps={hcps ?? []} products={products ?? []} />
 
       {error && (
         <p role="alert" className="text-destructive text-sm">

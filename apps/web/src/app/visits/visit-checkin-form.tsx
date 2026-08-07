@@ -11,14 +11,18 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 type Hcp = { id: string; first_name: string; last_name: string }
+type Product = { id: string; name: string }
 
-export function VisitCheckinForm({ hcps }: { hcps: Hcp[] }) {
+export function VisitCheckinForm({ hcps, products }: { hcps: Hcp[]; products: Product[] }) {
   const router = useRouter()
   const [hcpId, setHcpId] = useState(hcps[0]?.id ?? "")
   const [objective, setObjective] = useState("")
   const [notes, setNotes] = useState("")
+  const [productId, setProductId] = useState("")
+  const [sampleQty, setSampleQty] = useState("")
   const [submitting, setSubmitting] = useState(false)
   const [status, setStatus] = useState<string | null>(null)
+  const [sampleError, setSampleError] = useState<string | null>(null)
   const [isOnline, setIsOnline] = useState(true)
 
   useEffect(() => {
@@ -43,6 +47,7 @@ export function VisitCheckinForm({ hcps }: { hcps: Hcp[] }) {
     if (!hcpId) return
     setSubmitting(true)
     setStatus(null)
+    setSampleError(null)
 
     const supabase = createClient()
     const {
@@ -80,12 +85,36 @@ export function VisitCheckinForm({ hcps }: { hcps: Hcp[] }) {
           ? `Saved. ${synced} synced, ${failed} pending retry.`
           : "Visit logged and synced."
       )
+
+      // Samples need a live compliance/cap check, so they're only recorded once the
+      // visit itself has actually synced — not attempted from the offline queue.
+      if (productId && sampleQty && synced > 0) {
+        const { data: savedVisit } = await supabase
+          .from("visits")
+          .select("id")
+          .eq("client_id", clientId)
+          .maybeSingle()
+
+        if (savedVisit) {
+          const { error: sampleInsertError } = await supabase
+            .from("visit_products")
+            .insert({ visit_id: savedVisit.id, product_id: productId, sample_qty: Number(sampleQty) })
+          if (sampleInsertError) {
+            setSampleError(sampleInsertError.message)
+          }
+        }
+      }
     } else {
       setStatus("Offline — visit saved locally, will sync automatically when you reconnect.")
+      if (productId) {
+        setSampleError("Samples can't be recorded offline — add them from the visit once you're back online.")
+      }
     }
 
     setObjective("")
     setNotes("")
+    setProductId("")
+    setSampleQty("")
     setSubmitting(false)
     router.refresh()
   }
@@ -134,12 +163,50 @@ export function VisitCheckinForm({ hcps }: { hcps: Hcp[] }) {
             <Label htmlFor="notes">Outcome notes</Label>
             <Input id="notes" value={notes} onChange={(e) => setNotes(e.target.value)} />
           </div>
+
+          {isOnline && products.length > 0 && (
+            <div className="grid gap-1.5 sm:grid-cols-2 sm:gap-3">
+              <div className="grid gap-1.5">
+                <Label htmlFor="sample-product">Sample given (optional)</Label>
+                <select
+                  id="sample-product"
+                  value={productId}
+                  onChange={(e) => setProductId(e.target.value)}
+                  className="border rounded-md h-9 px-3 text-sm bg-background"
+                >
+                  <option value="">None</option>
+                  {products.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="grid gap-1.5">
+                <Label htmlFor="sample-qty">Quantity</Label>
+                <Input
+                  id="sample-qty"
+                  type="number"
+                  min="1"
+                  value={sampleQty}
+                  onChange={(e) => setSampleQty(e.target.value)}
+                  disabled={!productId}
+                />
+              </div>
+            </div>
+          )}
+
           <Button type="submit" disabled={submitting || !hcpId} className="w-fit">
             {submitting ? "Saving…" : "Check in"}
           </Button>
           {status && (
             <p role="status" className="text-sm text-muted-foreground">
               {status}
+            </p>
+          )}
+          {sampleError && (
+            <p role="alert" className="text-destructive text-sm">
+              {sampleError}
             </p>
           )}
         </form>

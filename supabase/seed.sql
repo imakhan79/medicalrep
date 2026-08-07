@@ -332,3 +332,8 @@ on conflict (id) do nothing;
 insert into public.tour_plan_visits (id, tour_plan_id, hcp_id, planned_date, notes) values
   ('00000000-0000-0000-0000-000000000051', '00000000-0000-0000-0000-000000000050', '00000000-0000-0000-0000-000000000030', '2026-08-11', 'Discuss CardioMax 10mg')
 on conflict (id) do nothing;
+
+insert into public.sample_allocations (id, organization_id, rep_id, product_id, period_month, allocated_qty, notes) values
+  ('00000000-0000-0000-0000-000000000060', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-0000000000a1',
+   '00000000-0000-0000-0000-000000000040', date_trunc('month', current_date)::date, 20, 'Monthly allocation')
+on conflict (id) do nothing;

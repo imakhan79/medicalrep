@@ -10,6 +10,7 @@ const links = [
   { href: "/visits", label: "Visits" },
   { href: "/tour-plans", label: "Tour Plans" },
   { href: "/expense-claims", label: "Expense Claims" },
+  { href: "/sample-inventory", label: "Sample Inventory" },
   { href: "/admin/roles", label: "Roles & Permissions" },
   { href: "/admin/staff", label: "Staff" },
 ]
