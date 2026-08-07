@@ -214,7 +214,7 @@ export default async function DashboardPage() {
         >
           {stats.slice(0, 3).map((stat) => (
             <div key={stat.label} className="flex items-baseline gap-2">
-              <span className="text-2xl sm:text-3xl font-semibold tracking-tight">{stat.value}</span>
+              <span className="font-display text-2xl sm:text-3xl font-bold tracking-tight tabular-nums">{stat.value}</span>
               <span className="text-xs sm:text-sm text-white/70">{stat.label}</span>
             </div>
           ))}
@@ -233,7 +233,7 @@ export default async function DashboardPage() {
               <CardContent className="pt-5 flex items-start justify-between gap-3">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
-                  <p className="text-3xl font-semibold tracking-tight text-foreground mt-1">{stat.value}</p>
+                  <p className="font-display text-3xl font-bold tracking-tight text-foreground tabular-nums mt-1">{stat.value}</p>
                 </div>
                 <div
                   className="shrink-0 grid place-items-center size-10 rounded-lg transition-transform duration-200 group-hover:scale-105"
@@ -267,7 +267,7 @@ export default async function DashboardPage() {
                 <CardContent className="pt-5 flex items-start justify-between gap-3">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
-                    <p className="text-3xl font-semibold tracking-tight text-foreground mt-1">{stat.value}</p>
+                    <p className="font-display text-3xl font-bold tracking-tight text-foreground tabular-nums mt-1">{stat.value}</p>
                   </div>
                   <div
                     className="shrink-0 grid place-items-center size-10 rounded-lg transition-transform duration-200 group-hover:scale-105"

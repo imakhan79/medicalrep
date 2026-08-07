@@ -161,7 +161,7 @@ export default function HomePage() {
           >
             {stats.map((s) => (
               <div key={s.label}>
-                <p className="text-2xl sm:text-3xl font-semibold text-white tracking-tight">{s.value}</p>
+                <p className="font-display text-2xl sm:text-3xl font-bold text-white tracking-tight tabular-nums">{s.value}</p>
                 <p className="text-xs sm:text-sm text-white/60 mt-0.5">{s.label}</p>
               </div>
             ))}

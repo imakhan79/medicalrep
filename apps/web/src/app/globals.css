@@ -199,6 +199,13 @@ body {
   border-color: var(--border);
 }
 
+h1, h2, h3,
+[data-slot="card-title"],
+.font-display {
+  font-family: var(--font-display), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
 :focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
