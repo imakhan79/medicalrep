@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0f766e",
+  themeColor: "#5c1d1d",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -33,7 +33,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <ServiceWorkerRegister />
         <NavBar />
-        <main className="flex-1 w-full max-w-5xl mx-auto p-4 sm:p-6">{children}</main>
+        <main className="flex-1 w-full max-w-6xl mx-auto p-4 sm:p-6">{children}</main>
       </body>
     </html>
   );

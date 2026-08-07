@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
@@ -71,58 +72,87 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto mt-12 space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Sign in</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="grid gap-4 max-w-sm">
-            <div className="grid gap-1.5">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-            </div>
-            <div className="grid gap-1.5">
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-            </div>
-            <Button type="submit" disabled={submitting}>
-              {submitting ? "Signing in…" : "Sign in"}
-            </Button>
-            {error && (
-              <p role="alert" className="text-destructive text-sm">
-                {error}
-              </p>
-            )}
-          </form>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Quick demo login</CardTitle>
-          <p className="text-sm text-muted-foreground">
-            One click per role — dev-only accounts, all password {DEMO_PASSWORD}.
-          </p>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {DEMO_ACCOUNTS.map((account) => (
-              <Button
-                key={account.email}
-                type="button"
-                variant="outline"
-                size="sm"
-                disabled={demoLoadingEmail !== null}
-                onClick={() => handleDemoLogin(account.email)}
-                className="justify-start"
-              >
-                {demoLoadingEmail === account.email ? "Signing in…" : account.role}
-              </Button>
-            ))}
+    <div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_1.4fr] lg:items-start">
+      <div
+        className="relative overflow-hidden rounded-xl p-8 text-primary-foreground flex flex-col justify-between min-h-[280px]"
+        style={{ background: "linear-gradient(145deg, #5c1d1d 0%, #3d1414 55%, #35474d 130%)" }}
+      >
+        <div
+          aria-hidden
+          className="absolute -right-10 -top-10 size-48 rounded-full opacity-20"
+          style={{ background: "#f2a93b" }}
+        />
+        <div className="relative flex items-center gap-3">
+          <div className="bg-white rounded-md p-1.5 shrink-0">
+            <Image src="/zicon-logo.png" alt="Zicon Technology" width={80} height={33} className="rounded-sm" />
           </div>
-        </CardContent>
-      </Card>
+          <span className="font-semibold text-lg">Medical Rep CRM</span>
+        </div>
+        <div className="relative space-y-2 mt-8">
+          <h1 className="text-2xl font-semibold leading-tight">
+            Field sales, samples, and compliance — one connected platform.
+          </h1>
+          <p className="text-sm text-white/80">
+            Territory-aware RBAC, live GPS tracking, approvals, and analytics for medical
+            representatives, managers, and every role in between.
+          </p>
+        </div>
+        <p className="relative text-xs text-white/60 mt-8">Powered by Zicon Technology</p>
+      </div>
+
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Sign in</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="grid gap-4 max-w-sm">
+              <div className="grid gap-1.5">
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              </div>
+              <div className="grid gap-1.5">
+                <Label htmlFor="password">Password</Label>
+                <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+              </div>
+              <Button type="submit" disabled={submitting}>
+                {submitting ? "Signing in…" : "Sign in"}
+              </Button>
+              {error && (
+                <p role="alert" className="text-destructive text-sm">
+                  {error}
+                </p>
+              )}
+            </form>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Quick demo login</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              One click per role — dev-only accounts, all password {DEMO_PASSWORD}.
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {DEMO_ACCOUNTS.map((account) => (
+                <Button
+                  key={account.email}
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={demoLoadingEmail !== null}
+                  onClick={() => handleDemoLogin(account.email)}
+                  className="justify-start"
+                >
+                  {demoLoadingEmail === account.email ? "Signing in…" : account.role}
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

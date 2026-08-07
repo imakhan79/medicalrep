@@ -4,10 +4,9 @@
   "description": "Field sales CRM & SFA platform for medical representatives",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#0f766e",
+  "background_color": "#17140f",
+  "theme_color": "#5c1d1d",
   "icons": [
-    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+    { "src": "/zicon-logo.png", "sizes": "442x182", "type": "image/png" }
   ]
 }
