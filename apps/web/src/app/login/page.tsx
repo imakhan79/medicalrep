@@ -8,29 +8,51 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Radar, Workflow, ShieldCheck } from "lucide-react"
 
 const DEMO_PASSWORD = "DevPassword123!"
 
-const DEMO_ACCOUNTS = [
-  { role: "Super Admin", email: "superadmin@medicalrep.dev" },
-  { role: "Platform Owner", email: "platformowner@medicalrep.dev" },
-  { role: "Company Admin", email: "admin1@medicalrep.dev" },
-  { role: "National Sales Manager", email: "nationalmanager@medicalrep.dev" },
-  { role: "Zonal Manager", email: "zonalmanager@medicalrep.dev" },
-  { role: "Regional Manager", email: "manager1@medicalrep.dev" },
-  { role: "Area Sales Manager", email: "areamanager@medicalrep.dev" },
-  { role: "Territory Manager", email: "territorymanager@medicalrep.dev" },
-  { role: "Medical Representative", email: "rep1@medicalrep.dev" },
-  { role: "Key Account Manager", email: "kam@medicalrep.dev" },
-  { role: "Product Manager", email: "productmanager@medicalrep.dev" },
-  { role: "Marketing Manager", email: "marketingmanager@medicalrep.dev" },
-  { role: "HR", email: "hr@medicalrep.dev" },
-  { role: "Finance", email: "finance@medicalrep.dev" },
-  { role: "Warehouse Manager", email: "warehouse@medicalrep.dev" },
-  { role: "Purchasing Officer", email: "purchasing@medicalrep.dev" },
-  { role: "Customer Support", email: "support@medicalrep.dev" },
-  { role: "Auditor", email: "auditor@medicalrep.dev" },
-  { role: "Guest", email: "guest@medicalrep.dev" },
+const DEMO_GROUPS = [
+  {
+    label: "Leadership",
+    accounts: [
+      { role: "Super Admin", email: "superadmin@medicalrep.dev" },
+      { role: "Platform Owner", email: "platformowner@medicalrep.dev" },
+      { role: "Company Admin", email: "admin1@medicalrep.dev" },
+      { role: "National Sales Manager", email: "nationalmanager@medicalrep.dev" },
+      { role: "Zonal Manager", email: "zonalmanager@medicalrep.dev" },
+      { role: "Regional Manager", email: "manager1@medicalrep.dev" },
+      { role: "Area Sales Manager", email: "areamanager@medicalrep.dev" },
+      { role: "Territory Manager", email: "territorymanager@medicalrep.dev" },
+    ],
+  },
+  {
+    label: "Field & Commercial",
+    accounts: [
+      { role: "Medical Representative", email: "rep1@medicalrep.dev" },
+      { role: "Key Account Manager", email: "kam@medicalrep.dev" },
+      { role: "Product Manager", email: "productmanager@medicalrep.dev" },
+      { role: "Marketing Manager", email: "marketingmanager@medicalrep.dev" },
+    ],
+  },
+  {
+    label: "Operations & Support",
+    accounts: [
+      { role: "HR", email: "hr@medicalrep.dev" },
+      { role: "Finance", email: "finance@medicalrep.dev" },
+      { role: "Warehouse Manager", email: "warehouse@medicalrep.dev" },
+      { role: "Purchasing Officer", email: "purchasing@medicalrep.dev" },
+      { role: "Customer Support", email: "support@medicalrep.dev" },
+      { role: "Auditor", email: "auditor@medicalrep.dev" },
+      { role: "Guest", email: "guest@medicalrep.dev" },
+    ],
+  },
+]
+
+const highlights = [
+  { icon: Radar, text: "Live GPS field tracking, territory-aware" },
+  { icon: Workflow, text: "One approval engine across every module" },
+  { icon: ShieldCheck, text: "19 roles, database-enforced RBAC + ABAC" },
 ]
 
 export default function LoginPage() {
@@ -73,45 +95,59 @@ export default function LoginPage() {
 
   return (
     <div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_1.4fr] lg:items-start">
-      <div className="relative overflow-hidden rounded-xl p-8 text-primary-foreground flex flex-col justify-between min-h-[280px]">
-        <Image
-          src="/images/hero-team.jpg"
-          alt=""
-          fill
-          priority
-          sizes="(max-width: 1024px) 100vw, 40vw"
-          className="object-cover object-[center_25%]"
+      <div
+        className="relative overflow-hidden rounded-xl p-8 text-primary-foreground flex flex-col justify-between min-h-[420px] animate-fade-up"
+        style={{
+          background:
+            "radial-gradient(130% 150% at 15% 0%, #7a2b2b 0%, #602020 35%, #3d1515 65%, #26343a 100%)",
+        }}
+      >
+        <div
+          aria-hidden
+          className="absolute -right-16 -top-16 size-64 rounded-full opacity-[0.2] blur-[2px] animate-float-slow"
+          style={{ background: "radial-gradient(circle, #f8b028 0%, transparent 70%)" }}
         />
         <div
           aria-hidden
-          className="absolute inset-0"
-          style={{ background: "linear-gradient(155deg, #602020 20%, rgba(61,20,20,0.95) 50%, rgba(53,71,77,0.6) 100%)" }}
+          className="absolute inset-0 opacity-[0.12]"
+          style={{
+            backgroundImage: "radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px)",
+            backgroundSize: "24px 24px",
+          }}
         />
-        <div
-          aria-hidden
-          className="absolute -right-10 -top-10 size-48 rounded-full opacity-20"
-          style={{ background: "#f8b028" }}
-        />
+
         <div className="relative flex items-center gap-3">
           <div className="bg-white rounded-md p-1.5 shrink-0">
             <Image src="/zicon-logo.png" alt="Zicon Technology" width={80} height={33} className="rounded-sm" />
           </div>
           <span className="font-semibold text-lg">Medical Rep CRM</span>
         </div>
-        <div className="relative space-y-2 mt-8">
+
+        <div className="relative space-y-4 mt-8">
           <h1 className="text-2xl font-semibold leading-tight">
             Field sales, samples, and compliance — one connected platform.
           </h1>
-          <p className="text-sm text-white/80">
+          <p className="text-sm text-white/80 leading-relaxed">
             Territory-aware RBAC, live GPS tracking, approvals, and analytics for medical
             representatives, managers, and every role in between.
           </p>
+          <ul className="space-y-2 pt-2">
+            {highlights.map((h) => (
+              <li key={h.text} className="flex items-center gap-2.5 text-sm text-white/85">
+                <span className="grid place-items-center size-7 rounded-md bg-white/10 ring-1 ring-white/15 shrink-0">
+                  <h.icon className="size-3.5" aria-hidden />
+                </span>
+                {h.text}
+              </li>
+            ))}
+          </ul>
         </div>
+
         <p className="relative text-xs text-white/60 mt-8">Powered by Zicon Technology</p>
       </div>
 
       <div className="space-y-6">
-        <Card>
+        <Card className="animate-fade-up" style={{ animationDelay: "0.05s" }}>
           <CardHeader>
             <CardTitle>Sign in</CardTitle>
           </CardHeader>
@@ -137,29 +173,36 @@ export default function LoginPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="animate-fade-up" style={{ animationDelay: "0.1s" }}>
           <CardHeader>
             <CardTitle className="text-base">Quick demo login</CardTitle>
             <p className="text-sm text-muted-foreground">
               One click per role — dev-only accounts, all password {DEMO_PASSWORD}.
             </p>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {DEMO_ACCOUNTS.map((account) => (
-                <Button
-                  key={account.email}
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  disabled={demoLoadingEmail !== null}
-                  onClick={() => handleDemoLogin(account.email)}
-                  className="justify-start"
-                >
-                  {demoLoadingEmail === account.email ? "Signing in…" : account.role}
-                </Button>
-              ))}
-            </div>
+          <CardContent className="space-y-5">
+            {DEMO_GROUPS.map((group) => (
+              <div key={group.label}>
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/80 mb-2">
+                  {group.label}
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {group.accounts.map((account) => (
+                    <Button
+                      key={account.email}
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={demoLoadingEmail !== null}
+                      onClick={() => handleDemoLogin(account.email)}
+                      className="justify-start"
+                    >
+                      {demoLoadingEmail === account.email ? "Signing in…" : account.role}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            ))}
           </CardContent>
         </Card>
       </div>
