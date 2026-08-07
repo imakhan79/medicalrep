@@ -15,6 +15,8 @@ const links = [
   { href: "/channel-partners", label: "Channel Partners" },
   { href: "/orders", label: "Orders" },
   { href: "/next-best-actions", label: "Next Best Actions" },
+  { href: "/territory-optimization", label: "Territory Optimization" },
+  { href: "/anomalies", label: "Anomalies" },
   { href: "/admin/roles", label: "Roles & Permissions" },
   { href: "/admin/staff", label: "Staff" },
 ]
