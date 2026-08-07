@@ -8,6 +8,8 @@ import {
   Users,
   ClipboardCheck,
   ArrowRight,
+  MapPin,
+  TrendingUp,
 } from "lucide-react"
 import { buttonVariants } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -17,65 +19,89 @@ const features = [
     icon: Radar,
     title: "Live Field Tracking",
     body: "Real-time GPS, geofenced visit detection, route replay, and statistical anti-spoofing — not a simple map widget.",
+    accent: "var(--chart-1)",
   },
   {
     icon: Workflow,
     title: "Built-In Approval Engine",
     body: "Tour plans, expense claims, orders, and leave all route through the same auditable draft → submit → approve workflow.",
+    accent: "var(--accent)",
   },
   {
     icon: Sparkles,
     title: "Deterministic AI Intelligence",
     body: "Next-best-action visit priority, territory load balancing, and anomaly detection — explainable, not a black box.",
+    accent: "var(--chart-3)",
   },
   {
     icon: ShieldCheck,
     title: "Enterprise RBAC + ABAC",
     body: "19 configurable roles with platform, org, hierarchy, territory, and own-record scoping enforced at the database layer.",
+    accent: "var(--primary)",
   },
   {
     icon: Users,
     title: "Every Role, One Platform",
     body: "From Medical Representative to Platform Owner — dedicated permissions, dashboards, and workflows for each.",
+    accent: "var(--chart-5)",
   },
   {
     icon: ClipboardCheck,
     title: "HR & Compliance Built In",
     body: "GPS-derived attendance, leave approvals, performance reviews, and an immutable audit log across every module.",
+    accent: "var(--chart-4)",
   },
+]
+
+const stats = [
+  { value: "19", label: "Configurable roles" },
+  { value: "6", label: "Connected modules" },
+  { value: "100%", label: "Auditable approvals" },
+  { value: "Live", label: "GPS field tracking" },
 ]
 
 export default function HomePage() {
   return (
     <div className="space-y-16 sm:space-y-24 pb-8">
-      <section className="relative overflow-hidden rounded-2xl min-h-[440px] sm:min-h-[520px] flex items-center -mt-2">
-        <Image
-          src="/images/hero-healthcare.jpg"
-          alt=""
-          fill
-          priority
-          sizes="(max-width: 768px) 100vw, 1152px"
-          className="object-cover object-[center_18%]"
+      <section
+        className="relative overflow-hidden rounded-2xl min-h-[520px] sm:min-h-[600px] flex items-center -mt-2"
+        style={{
+          background:
+            "radial-gradient(120% 140% at 12% 0%, #7a2b2b 0%, #602020 32%, #3d1515 62%, #26343a 100%)",
+        }}
+      >
+        {/* Brand glow accents */}
+        <div
+          aria-hidden
+          className="absolute -right-32 -top-32 size-[28rem] rounded-full opacity-[0.22] blur-[2px]"
+          style={{ background: "radial-gradient(circle, #f8b028 0%, transparent 70%)" }}
         />
         <div
           aria-hidden
-          className="absolute inset-0"
+          className="absolute -left-20 bottom-0 size-72 rounded-full opacity-[0.14] blur-[2px]"
+          style={{ background: "radial-gradient(circle, #a4b4b6 0%, transparent 70%)" }}
+        />
+        {/* Subtle dot-grid texture */}
+        <div
+          aria-hidden
+          className="absolute inset-0 opacity-[0.15]"
           style={{
-            background:
-              "linear-gradient(120deg, #602020 12%, rgba(61,20,20,0.93) 42%, rgba(53,71,77,0.55) 85%)",
+            backgroundImage: "radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px)",
+            backgroundSize: "28px 28px",
           }}
         />
         <div
           aria-hidden
-          className="absolute -right-24 -top-24 size-80 rounded-full opacity-[0.16] blur-[2px]"
-          style={{ background: "#f8b028" }}
+          className="absolute inset-0"
+          style={{ background: "linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.25) 100%)" }}
         />
 
-        <div className="relative w-full px-6 sm:px-12 py-14 flex flex-col items-start gap-6 max-w-3xl">
-          <div className="bg-white rounded-lg p-2.5 shadow-[var(--shadow-lg)]">
-            <Image src="/zicon-logo.png" alt="Zicon Technology" width={130} height={53} priority />
+        <div className="relative w-full px-6 sm:px-12 py-14 flex flex-col items-start gap-7 max-w-3xl">
+          <div className="bg-white rounded-xl p-3 shadow-[var(--shadow-lg)]">
+            <Image src="/zicon-logo.png" alt="Zicon Technology" width={140} height={57} priority />
           </div>
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-white/10 backdrop-blur px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-white/85">
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-white/10 backdrop-blur px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-[#f8b028] ring-1 ring-white/15">
+            <Sparkles className="size-3" aria-hidden />
             Field Force Intelligence Platform
           </div>
           <h1 className="text-4xl sm:text-6xl font-semibold tracking-tight text-white leading-[1.05]">
@@ -88,7 +114,7 @@ export default function HomePage() {
             single approval engine connecting every workflow — from HCP visits to
             expense claims to secondary sales orders.
           </p>
-          <div className="flex flex-wrap items-center gap-3 pt-2">
+          <div className="flex flex-wrap items-center gap-3 pt-1">
             <Link href="/login" className={buttonVariants({ size: "lg" })}>
               Sign in <ArrowRight className="size-4" aria-hidden />
             </Link>
@@ -99,6 +125,15 @@ export default function HomePage() {
             >
               Explore the demo
             </Link>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-8 pt-8 w-full border-t border-white/15 mt-2">
+            {stats.map((s) => (
+              <div key={s.label}>
+                <p className="text-2xl sm:text-3xl font-semibold text-white tracking-tight">{s.value}</p>
+                <p className="text-xs sm:text-sm text-white/60 mt-0.5">{s.label}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -112,9 +147,12 @@ export default function HomePage() {
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((f) => (
-            <Card key={f.title}>
+            <Card key={f.title} className="group">
               <CardContent className="pt-6">
-                <div className="grid place-items-center size-11 rounded-lg bg-primary-soft text-primary mb-4">
+                <div
+                  className="grid place-items-center size-11 rounded-lg mb-4 transition-transform duration-200 group-hover:scale-105"
+                  style={{ background: `color-mix(in oklch, ${f.accent}, transparent 88%)`, color: f.accent }}
+                >
                   <f.icon className="size-5" aria-hidden />
                 </div>
                 <h3 className="font-semibold text-foreground mb-1.5">{f.title}</h3>
@@ -125,25 +163,23 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="relative overflow-hidden rounded-2xl">
-        <div className="relative min-h-[320px] flex items-center">
-          <Image
-            src="/images/hero-team.jpg"
-            alt=""
-            fill
-            sizes="(max-width: 768px) 100vw, 1152px"
-            className="object-cover object-[center_30%]"
-          />
-          <div
-            aria-hidden
-            className="absolute inset-0"
-            style={{ background: "linear-gradient(90deg, rgba(53,71,77,0.92) 0%, rgba(53,71,77,0.7) 55%, rgba(53,71,77,0.25) 100%)" }}
-          />
-          <div className="relative px-6 sm:px-12 py-12 max-w-lg">
+      <section
+        className="relative overflow-hidden rounded-2xl"
+        style={{
+          background: "linear-gradient(115deg, #35474d 0%, #26343a 55%, #1c2529 100%)",
+        }}
+      >
+        <div
+          aria-hidden
+          className="absolute -right-16 -bottom-24 size-96 rounded-full opacity-[0.12]"
+          style={{ background: "radial-gradient(circle, #f8b028 0%, transparent 70%)" }}
+        />
+        <div className="relative grid lg:grid-cols-[1.1fr_1fr] items-center gap-8 px-6 sm:px-12 py-12">
+          <div className="max-w-lg">
             <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white mb-3">
               Nineteen roles. One connected platform.
             </h2>
-            <p className="text-white/85 text-sm sm:text-base leading-relaxed mb-6">
+            <p className="text-white/80 text-sm sm:text-base leading-relaxed mb-6">
               Super Admin to Medical Representative — every role gets its own permissions,
               territory-scoped visibility, and dashboard, configurable without touching code.
             </p>
@@ -154,6 +190,43 @@ export default function HomePage() {
             >
               See it in action <ArrowRight className="size-4" aria-hidden />
             </Link>
+          </div>
+
+          {/* Product preview mockup — real UI language, no stock photography */}
+          <div className="hidden lg:block rounded-xl bg-[#211c17]/80 ring-1 ring-white/10 shadow-[var(--shadow-lg)] p-4 backdrop-blur">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="size-2.5 rounded-full bg-[#f87171]/70" />
+              <span className="size-2.5 rounded-full bg-[#fbbf5c]/70" />
+              <span className="size-2.5 rounded-full bg-[#4ade80]/70" />
+              <span className="ml-auto flex items-center gap-1.5 text-[11px] text-white/50">
+                <MapPin className="size-3" aria-hidden /> Live Map
+              </span>
+            </div>
+            <div className="grid grid-cols-3 gap-2 mb-3">
+              {[
+                { label: "On duty", value: "12", color: "#4ade80" },
+                { label: "Visits today", value: "38", color: "#f8b028" },
+                { label: "Alerts", value: "2", color: "#f87171" },
+              ].map((k) => (
+                <div key={k.label} className="rounded-lg bg-white/5 p-2.5">
+                  <p className="text-lg font-semibold text-white">{k.value}</p>
+                  <p className="text-[10px] text-white/50">{k.label}</p>
+                  <span className="block h-1 w-full rounded-full mt-1.5" style={{ background: k.color, opacity: 0.7 }} />
+                </div>
+              ))}
+            </div>
+            <div className="rounded-lg bg-white/5 p-3 flex items-center gap-2">
+              <TrendingUp className="size-3.5 text-[#f8b028]" aria-hidden />
+              <div className="flex-1 flex items-end gap-1 h-10">
+                {[40, 65, 45, 80, 55, 90, 70].map((h, i) => (
+                  <span
+                    key={i}
+                    className="flex-1 rounded-sm"
+                    style={{ height: `${h}%`, background: i === 5 ? "#f8b028" : "rgba(255,255,255,0.25)" }}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
