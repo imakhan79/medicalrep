@@ -1,4 +1,6 @@
+import { Stethoscope } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
+import { PageHeader } from "@/components/page-header"
 import { HcpCreateForm } from "./hcp-create-form"
 
 export default async function HcpsPage() {
@@ -10,12 +12,11 @@ export default async function HcpsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Healthcare Providers</h1>
-        <p className="text-muted-foreground text-sm">
-          Doctors and HCPs visible to you, scoped by territory and role.
-        </p>
-      </div>
+      <PageHeader
+        icon={Stethoscope}
+        title="Healthcare Providers"
+        subtitle="Doctors and HCPs visible to you, scoped by territory and role."
+      />
 
       <HcpCreateForm />
 
@@ -39,8 +40,8 @@ export default async function HcpsPage() {
             <span
               className={`text-xs px-2 py-1 rounded-full ${
                 hcp.consent_status === "granted"
-                  ? "bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200"
-                  : "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200"
+                  ? "bg-success-soft text-success"
+                  : "bg-warning-soft text-warning"
               }`}
             >
               {hcp.consent_status}

@@ -126,8 +126,8 @@ export function VisitCheckinForm({ hcps, products }: { hcps: Hcp[]; products: Pr
         <span
           className={`text-xs px-2 py-1 rounded-full ${
             isOnline
-              ? "bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200"
-              : "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200"
+              ? "bg-success-soft text-success"
+              : "bg-warning-soft text-warning"
           }`}
         >
           {isOnline ? "Online" : "Offline — will sync later"}

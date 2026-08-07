@@ -120,7 +120,7 @@ export function AddStaffForm({
           </p>
         )}
         {created && (
-          <p role="status" className="text-sm text-teal-700 dark:text-teal-400 mt-2">
+          <p role="status" className="text-sm text-primary mt-2">
             Created {created.email} — password was <code>{created.password}</code> (shown once, share it now).
           </p>
         )}

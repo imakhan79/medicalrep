@@ -142,7 +142,7 @@ export function PermissionMatrix({
                             ))}
                           </select>
                         ) : currentScope ? (
-                          <span className="text-xs px-1.5 py-0.5 rounded bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200">
+                          <span className="text-xs px-1.5 py-0.5 rounded bg-success-soft text-success">
                             {currentScope}
                           </span>
                         ) : (

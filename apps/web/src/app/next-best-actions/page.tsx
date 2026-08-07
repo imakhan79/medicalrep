@@ -1,6 +1,8 @@
 import Link from "next/link"
+import { Sparkles } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { getCurrentOrgId } from "@/lib/org"
+import { PageHeader } from "@/components/page-header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { buttonVariants } from "@/components/ui/button"
 
@@ -28,13 +30,11 @@ export default async function NextBestActionsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Next Best Actions</h1>
-        <p className="text-muted-foreground text-sm">
-          HCPs ranked by visit recency and account tier — a deterministic priority score,
-          not a machine-learning prediction.
-        </p>
-      </div>
+      <PageHeader
+        icon={Sparkles}
+        title="Next Best Actions"
+        subtitle="HCPs ranked by visit recency and account tier — a deterministic priority score, not a machine-learning prediction."
+      />
 
       {error && (
         <p role="alert" className="text-destructive text-sm">
@@ -83,7 +83,7 @@ export default async function NextBestActionsPage() {
                         key={reason}
                         className={`text-xs px-1.5 py-0.5 rounded-full ${
                           reason.includes("Consent")
-                            ? "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200"
+                            ? "bg-warning-soft text-warning"
                             : "bg-muted text-muted-foreground"
                         }`}
                       >

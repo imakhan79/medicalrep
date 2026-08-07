@@ -5,55 +5,88 @@ import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
+import {
+  LayoutDashboard,
+  Stethoscope,
+  ClipboardList,
+  Map,
+  Package,
+  Receipt,
+  Target,
+  Handshake,
+  ShoppingCart,
+  Sparkles,
+  Compass,
+  ShieldAlert,
+  Radar,
+  Route,
+  CalendarClock,
+  UserCheck,
+  ClipboardCheck,
+  Building2,
+  KeyRound,
+  Users,
+  LogOut,
+  LogIn,
+  type LucideIcon,
+} from "lucide-react"
 
-const groups = [
+type NavLink = { href: string; label: string; icon: LucideIcon }
+
+const groups: { label: string; icon: LucideIcon; links: NavLink[] }[] = [
   {
     label: "Field Ops",
+    icon: Stethoscope,
     links: [
-      { href: "/hcps", label: "HCPs" },
-      { href: "/visits", label: "Visits" },
-      { href: "/tour-plans", label: "Tour Plans" },
-      { href: "/sample-inventory", label: "Samples" },
+      { href: "/hcps", label: "HCPs", icon: Stethoscope },
+      { href: "/visits", label: "Visits", icon: ClipboardList },
+      { href: "/tour-plans", label: "Tour Plans", icon: Map },
+      { href: "/sample-inventory", label: "Samples", icon: Package },
     ],
   },
   {
     label: "Commercial",
+    icon: Receipt,
     links: [
-      { href: "/expense-claims", label: "Expenses" },
-      { href: "/targets", label: "Targets" },
-      { href: "/channel-partners", label: "Partners" },
-      { href: "/orders", label: "Orders" },
+      { href: "/expense-claims", label: "Expenses", icon: Receipt },
+      { href: "/targets", label: "Targets", icon: Target },
+      { href: "/channel-partners", label: "Partners", icon: Handshake },
+      { href: "/orders", label: "Orders", icon: ShoppingCart },
     ],
   },
   {
     label: "Intelligence",
+    icon: Sparkles,
     links: [
-      { href: "/next-best-actions", label: "Next Best Actions" },
-      { href: "/territory-optimization", label: "Territory Optimization" },
-      { href: "/anomalies", label: "Anomalies" },
+      { href: "/next-best-actions", label: "Next Best Actions", icon: Sparkles },
+      { href: "/territory-optimization", label: "Territory Optimization", icon: Compass },
+      { href: "/anomalies", label: "Anomalies", icon: ShieldAlert },
     ],
   },
   {
     label: "Live Tracking",
+    icon: Radar,
     links: [
-      { href: "/field-tracking", label: "Live Map" },
-      { href: "/field-tracking/replay", label: "Route Replay" },
+      { href: "/field-tracking", label: "Live Map", icon: Radar },
+      { href: "/field-tracking/replay", label: "Route Replay", icon: Route },
     ],
   },
   {
     label: "HR",
+    icon: CalendarClock,
     links: [
-      { href: "/hr/leave", label: "Leave" },
-      { href: "/hr/attendance", label: "Attendance" },
-      { href: "/hr/performance", label: "Performance" },
+      { href: "/hr/leave", label: "Leave", icon: CalendarClock },
+      { href: "/hr/attendance", label: "Attendance", icon: UserCheck },
+      { href: "/hr/performance", label: "Performance", icon: ClipboardCheck },
     ],
   },
   {
     label: "Admin",
+    icon: KeyRound,
     links: [
-      { href: "/admin/companies", label: "Companies" },
-      { href: "/admin/roles", label: "Roles" },
-      { href: "/admin/staff", label: "Staff" },
+      { href: "/admin/companies", label: "Companies", icon: Building2 },
+      { href: "/admin/roles", label: "Roles", icon: KeyRound },
+      { href: "/admin/staff", label: "Staff", icon: Users },
     ],
   },
 ]
@@ -78,45 +111,56 @@ export function NavBar() {
   }
 
   return (
-    <header className="border-b bg-card sticky top-0 z-10">
-      <div className="max-w-6xl mx-auto flex items-center gap-4 px-3 sm:px-4 py-3">
-        <Link href="/" className="flex items-center gap-2 shrink-0">
-          <Image src="/zicon-logo.png" alt="Zicon Technology" width={64} height={26} />
-          <span className="font-semibold tracking-tight text-primary hidden sm:inline">Medical Rep CRM</span>
+    <header className="border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80 sticky top-0 z-20">
+      <div className="max-w-6xl mx-auto flex items-center gap-3 px-4 sm:px-6 py-3">
+        <Link href="/" className="flex items-center gap-2.5 shrink-0">
+          <Image src="/zicon-logo.png" alt="Zicon Technology" width={72} height={29} priority />
+          <span className="hidden lg:block h-6 w-px bg-divider" aria-hidden />
+          <span className="font-semibold tracking-tight text-foreground hidden sm:inline text-[15px]">
+            Medical Rep CRM
+          </span>
         </Link>
         <Link
           href="/"
-          className={`ml-2 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-            pathname === "/" ? "bg-primary text-primary-foreground" : "hover:bg-accent hover:text-accent-foreground"
+          className={`ml-1 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors duration-200 ${
+            pathname === "/"
+              ? "bg-primary text-primary-foreground shadow-[var(--shadow-sm)]"
+              : "text-foreground/70 hover:bg-muted hover:text-foreground"
           }`}
         >
+          <LayoutDashboard className="size-4" aria-hidden />
           Dashboard
         </Link>
-        <span className="ml-auto flex items-center gap-3 text-sm text-muted-foreground">
+        <span className="ml-auto flex items-center gap-2 text-sm">
           {email ? (
             <>
-              <span className="hidden md:inline">{email}</span>
+              <span className="hidden md:inline text-muted-foreground text-xs px-2.5 py-1 rounded-full bg-muted">
+                {email}
+              </span>
               <button
                 onClick={handleSignOut}
-                className="px-3 py-1.5 rounded-full font-medium hover:bg-accent hover:text-accent-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-medium text-foreground/70 hover:bg-muted hover:text-foreground transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
               >
-                Sign out
+                <LogOut className="size-4" aria-hidden />
+                <span className="hidden sm:inline">Sign out</span>
               </button>
             </>
           ) : (
             <Link
               href="/login"
-              className="px-3 py-1.5 rounded-full font-medium hover:bg-accent hover:text-accent-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-medium text-foreground/70 hover:bg-muted hover:text-foreground transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
             >
+              <LogIn className="size-4" aria-hidden />
               Sign in
             </Link>
           )}
         </span>
       </div>
-      <nav aria-label="Primary" className="max-w-6xl mx-auto flex items-stretch gap-5 overflow-x-auto px-3 sm:px-4 pb-3">
+      <nav aria-label="Primary" className="max-w-6xl mx-auto flex items-stretch gap-6 overflow-x-auto px-4 sm:px-6 pb-3">
         {groups.map((group) => (
           <div key={group.label} className="shrink-0">
-            <p className="text-[0.65rem] font-semibold uppercase tracking-wider text-muted-foreground/70 mb-1.5 px-1">
+            <p className="flex items-center gap-1 text-[0.65rem] font-semibold uppercase tracking-wider text-muted-foreground/70 mb-1.5 px-1">
+              <group.icon className="size-3" aria-hidden />
               {group.label}
             </p>
             <div className="flex items-center gap-1">
@@ -126,12 +170,14 @@ export function NavBar() {
                   <Link
                     key={link.href}
                     href={link.href}
-                    className={`px-2.5 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
+                    aria-current={active ? "page" : undefined}
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ${
                       active
-                        ? "bg-primary text-primary-foreground"
-                        : "hover:bg-accent hover:text-accent-foreground text-foreground/80"
+                        ? "bg-primary text-primary-foreground shadow-[var(--shadow-sm)]"
+                        : "text-foreground/75 hover:bg-muted hover:text-foreground"
                     }`}
                   >
+                    <link.icon className="size-3.5" aria-hidden />
                     {link.label}
                   </Link>
                 )

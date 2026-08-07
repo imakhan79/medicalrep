@@ -1,5 +1,7 @@
+import { Radar } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { getCurrentOrgId } from "@/lib/org"
+import { PageHeader } from "@/components/page-header"
 import { TrackingControls } from "./tracking-controls"
 import { LiveMap } from "./live-map"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -32,12 +34,11 @@ export default async function FieldTrackingPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Field Force Live Tracking</h1>
-        <p className="text-muted-foreground text-sm">
-          Real-time GPS, geofenced visit detection, and alerts — scoped to your role and territory.
-        </p>
-      </div>
+      <PageHeader
+        icon={Radar}
+        title="Field Force Live Tracking"
+        subtitle="Real-time GPS, geofenced visit detection, and alerts — scoped to your role and territory."
+      />
 
       {canCreate && <TrackingControls />}
 
@@ -62,9 +63,9 @@ export default async function FieldTrackingPage() {
                 <span
                   className={`text-xs px-2 py-1 rounded-full shrink-0 ${
                     a.severity === "critical"
-                      ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+                      ? "bg-destructive-soft text-destructive"
                       : a.severity === "warning"
-                        ? "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200"
+                        ? "bg-warning-soft text-warning"
                         : "bg-muted text-muted-foreground"
                   }`}
                 >

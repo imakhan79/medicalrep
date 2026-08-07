@@ -1,5 +1,7 @@
+import { ShieldAlert } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { getCurrentOrgId } from "@/lib/org"
+import { PageHeader } from "@/components/page-header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 type ExpenseAnomaly = {
@@ -38,13 +40,11 @@ export default async function AnomaliesPage() {
 
   if (notAuthorized) {
     return (
-      <div className="space-y-2">
-        <h1 className="text-2xl font-semibold">Anomaly Detection</h1>
-        <p className="text-muted-foreground text-sm">
-          This compliance view is only available to roles with broader-than-own visibility
-          (managers, finance, auditors) — not individual reps looking at their own data.
-        </p>
-      </div>
+      <PageHeader
+        icon={ShieldAlert}
+        title="Anomaly Detection"
+        subtitle="This compliance view is only available to roles with broader-than-own visibility (managers, finance, auditors) — not individual reps looking at their own data."
+      />
     )
   }
 
@@ -53,13 +53,11 @@ export default async function AnomaliesPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Anomaly Detection</h1>
-        <p className="text-muted-foreground text-sm">
-          Statistical outliers for compliance review — not fraud accusations. Deterministic
-          thresholds (&gt;2x historical or peer average, minimum sample size 3), not a model.
-        </p>
-      </div>
+      <PageHeader
+        icon={ShieldAlert}
+        title="Anomaly Detection"
+        subtitle="Statistical outliers for compliance review — not fraud accusations. Deterministic thresholds (>2x historical or peer average, minimum sample size 3), not a model."
+      />
 
       <Card>
         <CardHeader>
@@ -73,7 +71,7 @@ export default async function AnomaliesPage() {
                   <span className="font-medium">
                     {a.rep_email} — {a.category}: {a.amount.toLocaleString()}
                   </span>
-                  <span className="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200">
+                  <span className="text-xs px-2 py-1 rounded-full bg-warning-soft text-warning">
                     {a.deviation_ratio}x typical
                   </span>
                 </div>
@@ -99,7 +97,7 @@ export default async function AnomaliesPage() {
                   <span className="font-medium">
                     {a.rep_email} — {a.product_name}
                   </span>
-                  <span className="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200">
+                  <span className="text-xs px-2 py-1 rounded-full bg-warning-soft text-warning">
                     {a.deviation_ratio}x peer average
                   </span>
                 </div>

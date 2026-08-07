@@ -1,6 +1,8 @@
+import { KeyRound } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { getCurrentOrgId } from "@/lib/org"
 import Link from "next/link"
+import { PageHeader } from "@/components/page-header"
 import { NewRoleForm } from "./new-role-form"
 import { CloneRoleButton } from "./clone-role-button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -36,10 +38,11 @@ export default async function RolesAdminPage() {
   if (!canConfigure) {
     return (
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold">Roles & Permissions</h1>
-          <p className="text-muted-foreground text-sm">Read-only — you don&apos;t have the &apos;configure&apos; permission on roles.</p>
-        </div>
+        <PageHeader
+          icon={KeyRound}
+          title="Roles & Permissions"
+          subtitle="Read-only — you don't have the 'configure' permission on roles."
+        />
         <RoleList title="System Roles" roles={systemRoles} />
         {customRoles.length > 0 && <RoleList title="Custom Roles" roles={customRoles} />}
       </div>
@@ -48,12 +51,11 @@ export default async function RolesAdminPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Roles & Permissions</h1>
-        <p className="text-muted-foreground text-sm">
-          System roles are fixed defaults — clone one to create a customizable copy for your organization.
-        </p>
-      </div>
+      <PageHeader
+        icon={KeyRound}
+        title="Roles & Permissions"
+        subtitle="System roles are fixed defaults — clone one to create a customizable copy for your organization."
+      />
 
       <NewRoleForm orgId={orgId} />
 
@@ -96,7 +98,7 @@ function RoleList({
               {editable && (
                 <Link
                   href={`/admin/roles/${role.id}`}
-                  className="text-sm text-teal-700 dark:text-teal-400 hover:underline shrink-0"
+                  className="text-sm text-primary hover:underline shrink-0"
                 >
                   Edit permissions
                 </Link>

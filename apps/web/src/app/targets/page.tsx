@@ -1,5 +1,7 @@
+import { Target } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { getCurrentOrgId } from "@/lib/org"
+import { PageHeader } from "@/components/page-header"
 import { NewTargetForm } from "./new-target-form"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -54,10 +56,7 @@ export default async function TargetsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Targets</h1>
-        <p className="text-muted-foreground text-sm">Monthly targets set top-down, with live achievement.</p>
-      </div>
+      <PageHeader icon={Target} title="Targets" subtitle="Monthly targets set top-down, with live achievement." />
 
       {canCreate && <NewTargetForm orgId={orgId} periodMonth={periodMonth} members={memberList} />}
 

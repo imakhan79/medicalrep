@@ -1,10 +1,12 @@
+import { UserCheck } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { getCurrentOrgId } from "@/lib/org"
+import { PageHeader } from "@/components/page-header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 const STATUS_STYLES: Record<string, string> = {
-  present: "bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200",
-  late: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200",
+  present: "bg-success-soft text-success",
+  late: "bg-warning-soft text-warning",
   absent: "bg-muted text-muted-foreground",
 }
 
@@ -20,12 +22,11 @@ export default async function AttendancePage(props: PageProps<"/hr/attendance">)
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Attendance</h1>
-        <p className="text-muted-foreground text-sm">
-          Derived from GPS check-in/out — present if checked in, late after 9:30am, absent otherwise.
-        </p>
-      </div>
+      <PageHeader
+        icon={UserCheck}
+        title="Attendance"
+        subtitle="Derived from GPS check-in/out — present if checked in, late after 9:30am, absent otherwise."
+      />
 
       <form className="flex items-end gap-3">
         <div className="grid gap-1.5">

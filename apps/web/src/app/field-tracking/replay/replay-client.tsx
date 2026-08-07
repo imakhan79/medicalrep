@@ -323,7 +323,7 @@ export function ReplayClient({ orgId, members }: { orgId: string; members: Membe
           )}
           {unplanned.length > 0 && (
             <div>
-              <p className="font-medium text-amber-700 dark:text-amber-400">Unplanned (visited, not on plan)</p>
+              <p className="font-medium text-warning">Unplanned (visited, not on plan)</p>
               <ul className="list-disc list-inside">
                 {unplanned.map((u, i) => (
                   <li key={i}>{u.hcps?.first_name} {u.hcps?.last_name}</li>
@@ -333,7 +333,7 @@ export function ReplayClient({ orgId, members }: { orgId: string; members: Membe
           )}
           {completed.length > 0 && (
             <div>
-              <p className="font-medium text-teal-700 dark:text-teal-400">Completed as planned</p>
+              <p className="font-medium text-primary">Completed as planned</p>
               <ul className="list-disc list-inside">
                 {completed.map((c) => (
                   <li key={c.hcp_id}>{c.hcps?.first_name} {c.hcps?.last_name}</li>

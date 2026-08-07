@@ -38,14 +38,14 @@ export default async function RoleDetailPage(props: PageProps<"/admin/roles/[rol
     <div className="space-y-6">
       <div>
         <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-semibold">{role.name}</h1>
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">{role.name}</h1>
           <span className="text-xs px-2 py-1 rounded-full bg-muted text-muted-foreground">
             {role.is_system ? "System role" : "Custom role"}
           </span>
         </div>
         {role.description && <p className="text-muted-foreground text-sm">{role.description}</p>}
         {!editable && (
-          <p className="text-sm text-amber-700 dark:text-amber-400 mt-1">
+          <p className="text-sm text-warning mt-1">
             {role.is_system
               ? "System roles are fixed — clone this role from the roles list to create an editable copy."
               : "Read-only — you don't have the 'configure' permission on roles."}

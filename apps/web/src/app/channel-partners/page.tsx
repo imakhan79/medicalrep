@@ -1,4 +1,6 @@
+import { Handshake } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
+import { PageHeader } from "@/components/page-header"
 import { ChannelPartnerForm } from "./channel-partner-form"
 
 export default async function ChannelPartnersPage() {
@@ -10,12 +12,11 @@ export default async function ChannelPartnersPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Channel Partners</h1>
-        <p className="text-muted-foreground text-sm">
-          Stockists, distributors, and pharmacies that place secondary sales orders.
-        </p>
-      </div>
+      <PageHeader
+        icon={Handshake}
+        title="Channel Partners"
+        subtitle="Stockists, distributors, and pharmacies that place secondary sales orders."
+      />
 
       <ChannelPartnerForm />
 

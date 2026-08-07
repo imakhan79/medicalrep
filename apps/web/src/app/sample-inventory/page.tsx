@@ -1,5 +1,7 @@
+import { Package } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { getCurrentOrgId } from "@/lib/org"
+import { PageHeader } from "@/components/page-header"
 import { NewAllocationForm } from "./new-allocation-form"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -42,12 +44,11 @@ export default async function SampleInventoryPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Sample & Inventory</h1>
-        <p className="text-muted-foreground text-sm">
-          Monthly sample allocations and distribution, capped and consent-checked automatically.
-        </p>
-      </div>
+      <PageHeader
+        icon={Package}
+        title="Sample & Inventory"
+        subtitle="Monthly sample allocations and distribution, capped and consent-checked automatically."
+      />
 
       <Card>
         <CardHeader>

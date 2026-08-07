@@ -8,27 +8,53 @@
   --card-foreground: #1c1917;
   --popover: #ffffff;
   --popover-foreground: #1c1917;
+  --elevated: #ffffff;
 
   /* Zicon brand — pixel-sampled from the logo, not estimated:
      maroon #602020, steel-blue #a4b4b6, amber #f8b028 */
   --primary: #602020;
+  --primary-hover: #4c1a1a;
+  --primary-active: #3d1515;
   --primary-foreground: #ffffff;
+  --primary-soft: #f3e6e6;
+
   --secondary: #e9eef0;
   --secondary-foreground: #46595c;
   --accent: #f8b028;
+  --accent-hover: #e8a221;
   --accent-foreground: #3a2405;
 
   --muted: #f0efed;
   --muted-foreground: #6b6560;
 
+  --success: #15803d;
+  --success-foreground: #ffffff;
+  --success-soft: #e7f5ec;
+  --warning: #b45309;
+  --warning-foreground: #ffffff;
+  --warning-soft: #fdf1e0;
+  --info: #46595c;
+  --info-foreground: #ffffff;
+  --info-soft: #e9eef0;
   --destructive: #dc2626;
   --destructive-foreground: #ffffff;
+  --destructive-soft: #fbe9e9;
 
   --border: #e5e2df;
+  --divider: #edeae6;
   --input: #e5e2df;
   --ring: #602020;
 
+  --chart-1: #602020;
+  --chart-2: #a4b4b6;
+  --chart-3: #f8b028;
+  --chart-4: #46595c;
+  --chart-5: #b08968;
+
   --radius: 0.65rem;
+  --shadow-sm: 0 1px 2px 0 rgb(28 25 23 / 0.05);
+  --shadow-md: 0 2px 8px -2px rgb(28 25 23 / 0.08), 0 1px 2px -1px rgb(28 25 23 / 0.06);
+  --shadow-lg: 0 8px 24px -4px rgb(28 25 23 / 0.12), 0 2px 6px -2px rgb(28 25 23 / 0.06);
 }
 
 @theme inline {
@@ -38,23 +64,45 @@
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
+  --color-elevated: var(--elevated);
   --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-active: var(--primary-active);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-soft: var(--primary-soft);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
   --color-accent-foreground: var(--accent-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-soft: var(--warning-soft);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-info-soft: var(--info-soft);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive-soft: var(--destructive-soft);
   --color-border: var(--border);
+  --color-divider: var(--divider);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
   --radius-sm: calc(var(--radius) - 0.25rem);
   --radius-md: calc(var(--radius) - 0.125rem);
   --radius-lg: var(--radius);
-  --font-sans: var(--font-geist-sans);
+  --radius-xl: calc(var(--radius) + 0.35rem);
+  --font-sans: var(--font-inter);
   --font-mono: var(--font-geist-mono);
 }
 
@@ -65,30 +113,70 @@
 
     --card: #211c17;
     --card-foreground: #f2efe9;
-    --popover: #211c17;
+    --popover: #241f19;
     --popover-foreground: #f2efe9;
+    --elevated: #26211b;
 
     --primary: #c96b6b;
+    --primary-hover: #d68080;
+    --primary-active: #b85a5a;
     --primary-foreground: #211011;
+    --primary-soft: #3a2020;
+
     --secondary: #2c3a3f;
     --secondary-foreground: #cbdbe0;
     --accent: #f8b028;
+    --accent-hover: #ffc04d;
     --accent-foreground: #2b1a04;
 
     --muted: #2a2521;
     --muted-foreground: #a89f96;
 
+    --success: #4ade80;
+    --success-foreground: #0a2412;
+    --success-soft: #16321f;
+    --warning: #fbbf5c;
+    --warning-foreground: #2b1a04;
+    --warning-soft: #3a2a10;
+    --info: #9db8bd;
+    --info-foreground: #142023;
+    --info-soft: #23343a;
     --destructive: #f87171;
     --destructive-foreground: #2b0d0d;
+    --destructive-soft: #3a1c1c;
 
     --border: #3a332c;
+    --divider: #2e2822;
     --input: #3a332c;
     --ring: #c96b6b;
+
+    --chart-1: #d68080;
+    --chart-2: #a4b4b6;
+    --chart-3: #f8b028;
+    --chart-4: #9db8bd;
+    --chart-5: #c9a084;
+
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+    --shadow-md: 0 2px 8px -2px rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.3);
+    --shadow-lg: 0 8px 24px -4px rgb(0 0 0 / 0.5), 0 2px 6px -2px rgb(0 0 0 / 0.3);
   }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+* {
+  border-color: var(--border);
+}
+
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
 }

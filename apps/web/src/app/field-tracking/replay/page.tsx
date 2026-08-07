@@ -1,5 +1,7 @@
+import { Route } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { getCurrentOrgId } from "@/lib/org"
+import { PageHeader } from "@/components/page-header"
 import { ReplayClient } from "./replay-client"
 
 export default async function RouteReplayPage() {
@@ -14,13 +16,11 @@ export default async function RouteReplayPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Route Replay & Planned vs. Actual</h1>
-        <p className="text-muted-foreground text-sm">
-          Pick a rep and a date to replay their tracked movement and compare it against
-          that day's tour plan.
-        </p>
-      </div>
+      <PageHeader
+        icon={Route}
+        title="Route Replay & Planned vs. Actual"
+        subtitle="Pick a rep and a date to replay their tracked movement and compare it against that day's tour plan."
+      />
       <ReplayClient orgId={orgId} members={(members as { user_id: string; email: string }[]) ?? []} />
     </div>
   )

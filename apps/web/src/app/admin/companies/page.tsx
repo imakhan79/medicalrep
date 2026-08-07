@@ -1,4 +1,6 @@
+import { Building2 } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
+import { PageHeader } from "@/components/page-header"
 import { NewCompanyForm } from "./new-company-form"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -8,12 +10,11 @@ export default async function CompaniesPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Companies</h1>
-        <p className="text-muted-foreground text-sm">
-          Platform-level tenant management. Only visible in full to Platform Owner / Super Admin.
-        </p>
-      </div>
+      <PageHeader
+        icon={Building2}
+        title="Companies"
+        subtitle="Platform-level tenant management. Only visible in full to Platform Owner / Super Admin."
+      />
 
       <NewCompanyForm />
 

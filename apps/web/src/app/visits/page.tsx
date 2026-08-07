@@ -1,4 +1,6 @@
+import { ClipboardList } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
+import { PageHeader } from "@/components/page-header"
 import { VisitCheckinForm } from "./visit-checkin-form"
 
 export default async function VisitsPage() {
@@ -18,12 +20,11 @@ export default async function VisitsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Daily Call Reports</h1>
-        <p className="text-muted-foreground text-sm">
-          Log a visit — works offline and syncs automatically when you're back online.
-        </p>
-      </div>
+      <PageHeader
+        icon={ClipboardList}
+        title="Daily Call Reports"
+        subtitle="Log a visit — works offline and syncs automatically when you're back online."
+      />
 
       <VisitCheckinForm hcps={hcps ?? []} products={products ?? []} />
 

@@ -1,15 +1,17 @@
+import { CalendarClock } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { getCurrentOrgId } from "@/lib/org"
+import { PageHeader } from "@/components/page-header"
 import { NewLeaveForm } from "./new-leave-form"
 import { LeaveActions } from "./leave-actions"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 const STATUS_STYLES: Record<string, string> = {
   draft: "bg-muted text-muted-foreground",
-  submitted: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200",
-  escalated: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
-  approved: "bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200",
-  rejected: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+  submitted: "bg-warning-soft text-warning",
+  escalated: "bg-warning-soft text-warning",
+  approved: "bg-success-soft text-success",
+  rejected: "bg-destructive-soft text-destructive",
 }
 
 export default async function LeavePage() {
@@ -28,10 +30,11 @@ export default async function LeavePage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Leave Requests</h1>
-        <p className="text-muted-foreground text-sm">Request time off and route it for manager approval.</p>
-      </div>
+      <PageHeader
+        icon={CalendarClock}
+        title="Leave Requests"
+        subtitle="Request time off and route it for manager approval."
+      />
 
       <NewLeaveForm orgId={orgId} />
 

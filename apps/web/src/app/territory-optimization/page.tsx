@@ -1,5 +1,7 @@
+import { Compass } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { getCurrentOrgId } from "@/lib/org"
+import { PageHeader } from "@/components/page-header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 type TerritoryRow = {
@@ -15,11 +17,11 @@ type TerritoryRow = {
 }
 
 const FLAG_STYLES: Record<string, string> = {
-  overloaded: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
-  underutilized: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200",
-  unassigned: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+  overloaded: "bg-destructive-soft text-destructive",
+  underutilized: "bg-warning-soft text-warning",
+  unassigned: "bg-destructive-soft text-destructive",
   no_activity: "bg-muted text-muted-foreground",
-  balanced: "bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200",
+  balanced: "bg-success-soft text-success",
 }
 
 const FLAG_LABELS: Record<string, string> = {
@@ -43,13 +45,11 @@ export default async function TerritoryOptimizationPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Territory Optimization</h1>
-        <p className="text-muted-foreground text-sm">
-          HCP-per-rep load compared against the average across territories you can see —
-          not a machine-learning model, a documented ratio (&gt;30% above/below average).
-        </p>
-      </div>
+      <PageHeader
+        icon={Compass}
+        title="Territory Optimization"
+        subtitle="HCP-per-rep load compared against the average across territories you can see — not a machine-learning model, a documented ratio (>30% above/below average)."
+      />
 
       {error && (
         <p role="alert" className="text-destructive text-sm">

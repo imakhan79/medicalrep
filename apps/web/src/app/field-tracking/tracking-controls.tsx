@@ -146,7 +146,7 @@ export function TrackingControls({ intervalSeconds = 30 }: { intervalSeconds?: n
       <Button variant="destructive" onClick={handleSOS}>
         SOS
       </Button>
-      {status && <span className="text-sm text-teal-700 dark:text-teal-400">{status}</span>}
+      {status && <span className="text-sm text-primary">{status}</span>}
       {error && (
         <span role="alert" className="text-destructive text-sm">
           {error}

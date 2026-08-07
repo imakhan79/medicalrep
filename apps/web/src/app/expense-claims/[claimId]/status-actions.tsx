@@ -66,7 +66,7 @@ export function StatusActions({
       {["submitted", "escalated"].includes(status) && (
         <>
           {canApprove && overLimit && (
-            <p className="text-sm text-amber-700 dark:text-amber-400">
+            <p className="text-sm text-warning">
               This claim exceeds your {approvalLimit?.toLocaleString()} approval limit — escalate it to a
               higher tier instead of approving.
             </p>

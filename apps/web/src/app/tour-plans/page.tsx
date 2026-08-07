@@ -1,14 +1,16 @@
 import Link from "next/link"
+import { Map } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
+import { PageHeader } from "@/components/page-header"
 import { NewTourPlanForm } from "./new-tour-plan-form"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 const STATUS_STYLES: Record<string, string> = {
   draft: "bg-muted text-muted-foreground",
-  submitted: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200",
-  escalated: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
-  approved: "bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200",
-  rejected: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+  submitted: "bg-warning-soft text-warning",
+  escalated: "bg-warning-soft text-warning",
+  approved: "bg-success-soft text-success",
+  rejected: "bg-destructive-soft text-destructive",
 }
 
 export default async function TourPlansPage() {
@@ -23,12 +25,11 @@ export default async function TourPlansPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Tour Plans</h1>
-        <p className="text-muted-foreground text-sm">
-          Plan visits ahead of time and route them for manager approval.
-        </p>
-      </div>
+      <PageHeader
+        icon={Map}
+        title="Tour Plans"
+        subtitle="Plan visits ahead of time and route them for manager approval."
+      />
 
       <NewTourPlanForm territories={territories ?? []} />
 
