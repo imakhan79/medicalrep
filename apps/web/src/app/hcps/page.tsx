@@ -1,5 +1,6 @@
 import { Stethoscope } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
+import { getCurrentOrgId } from "@/lib/org"
 import { PageHeader } from "@/components/page-header"
 import { HcpCreateForm } from "./hcp-create-form"
 
@@ -7,6 +8,10 @@ const LIST_LIMIT = 200
 
 export default async function HcpsPage() {
   const supabase = await createClient()
+  const orgId = await getCurrentOrgId(supabase)
+  const { data: canCreate } = orgId
+    ? await supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "hcps", p_action: "create" })
+    : { data: false }
   const { data: hcps, error } = await supabase
     .from("hcps")
     .select("id, first_name, last_name, specialty, tier, consent_status")
@@ -21,7 +26,7 @@ export default async function HcpsPage() {
         subtitle="Doctors and HCPs visible to you, scoped by territory and role."
       />
 
-      <HcpCreateForm />
+      {canCreate && <HcpCreateForm />}
 
       {error && (
         <p role="alert" className="text-destructive text-sm">

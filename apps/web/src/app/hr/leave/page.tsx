@@ -25,6 +25,12 @@ export default async function LeavePage() {
     data: { user },
   } = await supabase.auth.getUser()
 
+  const { data: canCreate } = await supabase.rpc("can_access_row", {
+    p_org_id: orgId,
+    p_resource_key: "leave_requests",
+    p_action: "create",
+  })
+
   const { data: requests, error } = await supabase
     .from("leave_requests")
     .select("id, rep_id, territory_id, leave_type, start_date, end_date, reason, status, decision_notes")
@@ -62,7 +68,7 @@ export default async function LeavePage() {
         subtitle="Request time off and route it for manager approval."
       />
 
-      <NewLeaveForm orgId={orgId} />
+      {canCreate && <NewLeaveForm orgId={orgId} />}
 
       {error && (
         <p role="alert" className="text-destructive text-sm">

@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { ShoppingCart } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
+import { getCurrentOrgId } from "@/lib/org"
 import { PageHeader } from "@/components/page-header"
 import { NewOrderForm } from "./new-order-form"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -17,6 +18,10 @@ const LIST_LIMIT = 200
 
 export default async function OrdersPage() {
   const supabase = await createClient()
+  const orgId = await getCurrentOrgId(supabase)
+  const { data: canCreate } = orgId
+    ? await supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "orders", p_action: "create" })
+    : { data: false }
 
   const { data: partners } = await supabase.from("channel_partners").select("id, name").order("name")
 
@@ -34,7 +39,7 @@ export default async function OrdersPage() {
         subtitle="Secondary sales orders from stockists, distributors, and pharmacies."
       />
 
-      <NewOrderForm partners={partners ?? []} />
+      {canCreate && <NewOrderForm partners={partners ?? []} />}
 
       {error && (
         <p role="alert" className="text-destructive text-sm">

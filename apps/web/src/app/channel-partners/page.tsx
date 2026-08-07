@@ -1,5 +1,6 @@
 import { Handshake } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
+import { getCurrentOrgId } from "@/lib/org"
 import { PageHeader } from "@/components/page-header"
 import { ChannelPartnerForm } from "./channel-partner-form"
 
@@ -7,6 +8,10 @@ const LIST_LIMIT = 200
 
 export default async function ChannelPartnersPage() {
   const supabase = await createClient()
+  const orgId = await getCurrentOrgId(supabase)
+  const { data: canCreate } = orgId
+    ? await supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "channel_partners", p_action: "create" })
+    : { data: false }
   const { data: partners, error } = await supabase
     .from("channel_partners")
     .select("id, name, type, contact_phone, contact_email")
@@ -21,7 +26,7 @@ export default async function ChannelPartnersPage() {
         subtitle="Stockists, distributors, and pharmacies that place secondary sales orders."
       />
 
-      <ChannelPartnerForm />
+      {canCreate && <ChannelPartnerForm />}
 
       {error && (
         <p role="alert" className="text-destructive text-sm">

@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { Map } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
+import { getCurrentOrgId } from "@/lib/org"
 import { PageHeader } from "@/components/page-header"
 import { NewTourPlanForm } from "./new-tour-plan-form"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -17,6 +18,10 @@ const LIST_LIMIT = 200
 
 export default async function TourPlansPage() {
   const supabase = await createClient()
+  const orgId = await getCurrentOrgId(supabase)
+  const { data: canCreate } = orgId
+    ? await supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "tour_plans", p_action: "create" })
+    : { data: false }
 
   const { data: territories } = await supabase.from("territories").select("id, name").order("name")
 
@@ -34,7 +39,7 @@ export default async function TourPlansPage() {
         subtitle="Plan visits ahead of time and route them for manager approval."
       />
 
-      <NewTourPlanForm territories={territories ?? []} />
+      {canCreate && <NewTourPlanForm territories={territories ?? []} />}
 
       {error && (
         <p role="alert" className="text-destructive text-sm">

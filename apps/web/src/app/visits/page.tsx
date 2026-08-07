@@ -1,5 +1,6 @@
 import { ClipboardList } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
+import { getCurrentOrgId } from "@/lib/org"
 import { PageHeader } from "@/components/page-header"
 import { VisitCheckinForm } from "./visit-checkin-form"
 
@@ -7,6 +8,10 @@ const LIST_LIMIT = 50
 
 export default async function VisitsPage() {
   const supabase = await createClient()
+  const orgId = await getCurrentOrgId(supabase)
+  const { data: canCreate } = orgId
+    ? await supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "visits", p_action: "create" })
+    : { data: false }
   const { data: hcps } = await supabase
     .from("hcps")
     .select("id, first_name, last_name")
@@ -28,7 +33,7 @@ export default async function VisitsPage() {
         subtitle="Log a visit — works offline and syncs automatically when you're back online."
       />
 
-      <VisitCheckinForm hcps={hcps ?? []} products={products ?? []} />
+      {canCreate && <VisitCheckinForm hcps={hcps ?? []} products={products ?? []} />}
 
       {error && (
         <p role="alert" className="text-destructive text-sm">

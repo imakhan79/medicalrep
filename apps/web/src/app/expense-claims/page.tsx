@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { Receipt } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
+import { getCurrentOrgId } from "@/lib/org"
 import { PageHeader } from "@/components/page-header"
 import { NewClaimForm } from "./new-claim-form"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -17,6 +18,10 @@ const LIST_LIMIT = 200
 
 export default async function ExpenseClaimsPage() {
   const supabase = await createClient()
+  const orgId = await getCurrentOrgId(supabase)
+  const { data: canCreate } = orgId
+    ? await supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "expense_claims", p_action: "create" })
+    : { data: false }
 
   const { data: claims, error } = await supabase
     .from("expense_claims")
@@ -32,7 +37,7 @@ export default async function ExpenseClaimsPage() {
         subtitle="Submit expenses for approval. Large claims route to a higher approval tier automatically."
       />
 
-      <NewClaimForm />
+      {canCreate && <NewClaimForm />}
 
       {error && (
         <p role="alert" className="text-destructive text-sm">

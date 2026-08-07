@@ -17,13 +17,14 @@ export default async function PerformancePage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  const [{ data: members }, { data: reviews, error }] = await Promise.all([
+  const [{ data: members }, { data: reviews, error }, { data: canCreate }] = await Promise.all([
     supabase.rpc("list_org_members", { p_org_id: orgId }),
     supabase
       .from("performance_reviews")
       .select("id, rep_id, review_period, rating, strengths, improvements, status")
       .order("created_at", { ascending: false })
       .limit(LIST_LIMIT),
+    supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "performance_reviews", p_action: "create" }),
   ])
 
   const memberList = (members as { user_id: string; email: string }[] | null) ?? []
@@ -37,7 +38,7 @@ export default async function PerformancePage() {
         subtitle="Manager-authored, employee-acknowledged."
       />
 
-      <NewReviewForm orgId={orgId} members={memberList} />
+      {canCreate && <NewReviewForm orgId={orgId} members={memberList} />}
 
       {error && (
         <p role="alert" className="text-destructive text-sm">
