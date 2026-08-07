@@ -155,7 +155,7 @@ begin
       ('medical_representative', 'products', array['view'], 'org'),
       ('medical_representative', 'visits', array['view','create','edit'], 'own'),
       ('medical_representative', 'tour_plans', array['view','create','edit'], 'own'),
-      ('medical_representative', 'expense_claims', array['view','create'], 'own'),
+      ('medical_representative', 'expense_claims', array['view','create','edit'], 'own'),
       ('medical_representative', 'sample_inventory', array['view'], 'own'),
 
       ('key_account_manager', 'hcos', array['view','edit'], 'territory'),
@@ -163,7 +163,7 @@ begin
       ('key_account_manager', 'products', array['view'], 'org'),
       ('key_account_manager', 'visits', array['view','create','edit'], 'own'),
       ('key_account_manager', 'tour_plans', array['view','create','edit'], 'own'),
-      ('key_account_manager', 'expense_claims', array['view','create'], 'own'),
+      ('key_account_manager', 'expense_claims', array['view','create','edit'], 'own'),
       ('key_account_manager', 'orders', array['view','create'], 'own'),
 
       -- Functional / back-office roles
@@ -235,6 +235,27 @@ begin
     end loop;
   end loop;
 end $$;
+
+-- ── Expense claim approval limits (ABAC via role_permissions.conditions) ───────
+-- Area Sales Manager can approve up to 5,000; must escalate above that.
+-- Zonal/Regional Manager have a higher cap; National/Company Admin/Finance are uncapped.
+update public.role_permissions rp
+set conditions = '{"max_amount": 5000}'::jsonb
+where rp.role_id = (select id from public.roles where key = 'area_sales_manager' and organization_id is null)
+  and rp.permission_id = (
+    select p.id from public.permissions p join public.resources r on r.id = p.resource_id
+    where r.key = 'expense_claims' and p.action = 'approve'
+  );
+
+update public.role_permissions rp
+set conditions = '{"max_amount": 20000}'::jsonb
+where rp.role_id in (
+    select id from public.roles where key in ('zonal_manager', 'regional_manager') and organization_id is null
+  )
+  and rp.permission_id = (
+    select p.id from public.permissions p join public.resources r on r.id = p.resource_id
+    where r.key = 'expense_claims' and p.action = 'approve'
+  );
 
 -- ── Dev auth users (password: DevPassword123! — dev-only) ──────────────────────
 insert into auth.users (
