@@ -12,6 +12,8 @@ const links = [
   { href: "/expense-claims", label: "Expense Claims" },
   { href: "/sample-inventory", label: "Sample Inventory" },
   { href: "/targets", label: "Targets" },
+  { href: "/channel-partners", label: "Channel Partners" },
+  { href: "/orders", label: "Orders" },
   { href: "/admin/roles", label: "Roles & Permissions" },
   { href: "/admin/staff", label: "Staff" },
 ]

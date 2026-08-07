@@ -10,6 +10,7 @@ insert into public.resources (key, name, module) values
   ('hcos', 'Healthcare Organizations', 'master_data'),
   ('hcps', 'Healthcare Providers', 'master_data'),
   ('products', 'Products', 'master_data'),
+  ('channel_partners', 'Channel Partners (Stockists/Distributors/Pharmacies)', 'master_data'),
   ('visits', 'Visits / Daily Call Reports', 'field_execution'),
   ('tour_plans', 'Tour Plans', 'planning'),
   ('targets', 'Targets', 'planning'),
@@ -68,6 +69,7 @@ begin
       ('super_admin', 'hcos', array['view','create','edit','delete','import','export'], 'platform'),
       ('super_admin', 'hcps', array['view','create','edit','delete','import','export'], 'platform'),
       ('super_admin', 'products', array['view','create','edit','delete','import','export'], 'platform'),
+      ('super_admin', 'channel_partners', array['view','create','edit','delete','import','export'], 'platform'),
       ('super_admin', 'visits', array['view','create','edit','delete','export'], 'platform'),
       ('super_admin', 'tour_plans', array['view','create','edit','delete','approve','reject'], 'platform'),
       ('super_admin', 'targets', array['view','create','edit','delete'], 'platform'),
@@ -91,6 +93,7 @@ begin
       ('company_admin', 'hcos', array['view','create','edit','delete','import','export'], 'org'),
       ('company_admin', 'hcps', array['view','create','edit','delete','import','export'], 'org'),
       ('company_admin', 'products', array['view','create','edit','delete','import','export'], 'org'),
+      ('company_admin', 'channel_partners', array['view','create','edit','delete','import','export'], 'org'),
       ('company_admin', 'visits', array['view','create','edit','delete','export'], 'org'),
       ('company_admin', 'tour_plans', array['view','create','edit','delete','approve','reject'], 'org'),
       ('company_admin', 'targets', array['view','create','edit','delete'], 'org'),
@@ -143,6 +146,7 @@ begin
       ('area_sales_manager', 'targets', array['view','edit'], 'hierarchy'),
 
       ('territory_manager', 'hcos', array['view'], 'territory'),
+      ('territory_manager', 'channel_partners', array['view'], 'territory'),
       ('territory_manager', 'hcps', array['view','create','edit'], 'territory'),
       ('territory_manager', 'visits', array['view'], 'territory'),
       ('territory_manager', 'tour_plans', array['view','create','edit'], 'territory'),
@@ -154,6 +158,7 @@ begin
       ('medical_representative', 'hcos', array['view'], 'territory'),
       ('medical_representative', 'hcps', array['view'], 'territory'),
       ('medical_representative', 'products', array['view'], 'org'),
+      ('medical_representative', 'channel_partners', array['view'], 'territory'),
       ('medical_representative', 'visits', array['view','create','edit'], 'own'),
       ('medical_representative', 'tour_plans', array['view','create','edit'], 'own'),
       ('medical_representative', 'expense_claims', array['view','create','edit'], 'own'),
@@ -167,7 +172,8 @@ begin
       ('key_account_manager', 'visits', array['view','create','edit'], 'own'),
       ('key_account_manager', 'tour_plans', array['view','create','edit'], 'own'),
       ('key_account_manager', 'expense_claims', array['view','create','edit'], 'own'),
-      ('key_account_manager', 'orders', array['view','create'], 'own'),
+      ('key_account_manager', 'orders', array['view','create','edit'], 'own'),
+      ('key_account_manager', 'channel_partners', array['view','edit'], 'territory'),
       ('key_account_manager', 'targets', array['view'], 'own'),
       ('key_account_manager', 'reports', array['view'], 'own'),
 
@@ -187,15 +193,17 @@ begin
       ('hr', 'reports', array['view','export'], 'org'),
 
       ('finance', 'expense_claims', array['view','approve','reject','export'], 'org'),
-      ('finance', 'orders', array['view','approve','export'], 'org'),
+      ('finance', 'orders', array['view','approve','reject','export'], 'org'),
       ('finance', 'reports', array['view','export'], 'org'),
       ('finance', 'targets', array['view'], 'org'),
 
       ('warehouse_manager', 'sample_inventory', array['view','create','edit','delete','assign','import','export'], 'org'),
       ('warehouse_manager', 'orders', array['view','edit','export'], 'org'),
       ('warehouse_manager', 'products', array['view'], 'org'),
+      ('warehouse_manager', 'channel_partners', array['view'], 'org'),
 
-      ('purchasing_officer', 'orders', array['view','create','edit','approve','export'], 'org'),
+      ('purchasing_officer', 'orders', array['view','create','edit','approve','reject','export'], 'org'),
+      ('purchasing_officer', 'channel_partners', array['view','create','edit'], 'org'),
       ('purchasing_officer', 'sample_inventory', array['view'], 'org'),
       ('purchasing_officer', 'reports', array['view'], 'org'),
 
@@ -207,6 +215,7 @@ begin
       ('auditor', 'memberships', array['view'], 'org'),
       ('auditor', 'territories', array['view'], 'org'),
       ('auditor', 'hcos', array['view','export'], 'org'),
+      ('auditor', 'channel_partners', array['view','export'], 'org'),
       ('auditor', 'hcps', array['view','export'], 'org'),
       ('auditor', 'visits', array['view','export'], 'org'),
       ('auditor', 'tour_plans', array['view','export'], 'org'),
@@ -346,4 +355,16 @@ on conflict (id) do nothing;
 insert into public.targets (id, organization_id, rep_id, metric_type, period_month, target_value, notes) values
   ('00000000-0000-0000-0000-000000000070', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-0000000000a1',
    'visit_count', date_trunc('month', current_date)::date, 15, 'Monthly visit frequency target')
+on conflict (id) do nothing;
+
+insert into public.channel_partners (id, organization_id, name, type, territory_id, contact_phone) values
+  ('00000000-0000-0000-0000-000000000080', '00000000-0000-0000-0000-000000000001', 'North Zone Pharma Distributors', 'distributor', '00000000-0000-0000-0000-000000000010', '+1-555-0100')
+on conflict (id) do nothing;
+
+insert into public.orders (id, organization_id, channel_partner_id, placed_by, status) values
+  ('00000000-0000-0000-0000-000000000081', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000080', '00000000-0000-0000-0000-0000000000a3', 'draft')
+on conflict (id) do nothing;
+
+insert into public.order_items (id, order_id, product_id, quantity, unit_price) values
+  ('00000000-0000-0000-0000-000000000082', '00000000-0000-0000-0000-000000000081', '00000000-0000-0000-0000-000000000040', 100, 12.50)
 on conflict (id) do nothing;
