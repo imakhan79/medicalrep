@@ -29,6 +29,8 @@ import {
   History,
   MapPinned,
   Settings,
+  Building,
+  BarChart3,
   LogOut,
   LogIn,
   type LucideIcon,
@@ -42,6 +44,7 @@ const groups: { label: string; icon: LucideIcon; links: NavLink[] }[] = [
     icon: Stethoscope,
     links: [
       { href: "/hcps", label: "HCPs", icon: Stethoscope },
+      { href: "/hcos", label: "HCOs", icon: Building },
       { href: "/visits", label: "Visits", icon: ClipboardList },
       { href: "/tour-plans", label: "Tour Plans", icon: Map },
       { href: "/sample-inventory", label: "Samples", icon: Package },
@@ -55,6 +58,7 @@ const groups: { label: string; icon: LucideIcon; links: NavLink[] }[] = [
       { href: "/targets", label: "Targets", icon: Target },
       { href: "/channel-partners", label: "Partners", icon: Handshake },
       { href: "/orders", label: "Orders", icon: ShoppingCart },
+      { href: "/products", label: "Products", icon: Package },
     ],
   },
   {
@@ -64,6 +68,7 @@ const groups: { label: string; icon: LucideIcon; links: NavLink[] }[] = [
       { href: "/next-best-actions", label: "Next Best Actions", icon: Sparkles },
       { href: "/territory-optimization", label: "Territory Optimization", icon: Compass },
       { href: "/anomalies", label: "Anomalies", icon: ShieldAlert },
+      { href: "/reports", label: "Reports", icon: BarChart3 },
     ],
   },
   {
@@ -92,6 +97,7 @@ const groups: { label: string; icon: LucideIcon; links: NavLink[] }[] = [
       { href: "/admin/companies", label: "Companies", icon: Building2 },
       { href: "/admin/roles", label: "Roles", icon: KeyRound },
       { href: "/admin/staff", label: "Staff", icon: Users },
+      { href: "/admin/territories", label: "Territories", icon: Map },
       { href: "/admin/audit-log", label: "Audit Log", icon: History },
     ],
   },
