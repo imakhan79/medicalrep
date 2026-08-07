@@ -30,7 +30,7 @@ type TeamRow = {
   coverage_pct: number
 }
 
-type Persona = "admin" | "manager" | "field" | "hr" | "finance" | "warehouse" | "general"
+type Persona = "admin" | "manager" | "field" | "hr" | "finance" | "purchasing" | "warehouse" | "general"
 
 const PERSONA_BY_ROLE: Record<string, Persona> = {
   super_admin: "admin",
@@ -45,7 +45,9 @@ const PERSONA_BY_ROLE: Record<string, Persona> = {
   key_account_manager: "field",
   hr: "hr",
   finance: "finance",
-  purchasing_officer: "finance",
+  // Purchasing Officer has no expense_claims permission — grouping it under
+  // "finance" would show an always-zero card. It gets its own persona instead.
+  purchasing_officer: "purchasing",
   warehouse_manager: "warehouse",
   product_manager: "general",
   marketing_manager: "general",
@@ -60,6 +62,7 @@ const PERSONA_ACCENT: Record<Persona, string> = {
   field: "var(--chart-4)",
   hr: "var(--chart-5)",
   finance: "var(--accent)",
+  purchasing: "var(--chart-2)",
   warehouse: "var(--chart-3)",
   general: "var(--secondary-foreground)",
 }
@@ -77,7 +80,7 @@ export default async function DashboardPage() {
   const periodMonth = currentPeriodMonth()
   const pendingStatuses = ["submitted", "escalated"]
 
-  const [{ count: hcpCount }, { count: visitCount }, { count: todayCount }] =
+  const [{ count: hcpCount }, { count: visitCount }, { count: todayCount }, { data: canViewHcps }, { data: canViewVisits }] =
     await Promise.all([
       supabase.from("hcps").select("*", { count: "exact", head: true }),
       supabase.from("visits").select("*", { count: "exact", head: true }),
@@ -85,6 +88,12 @@ export default async function DashboardPage() {
         .from("visits")
         .select("*", { count: "exact", head: true })
         .gte("visited_at", new Date().toISOString().slice(0, 10)),
+      orgId
+        ? supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "hcps", p_action: "view" })
+        : Promise.resolve({ data: false }),
+      orgId
+        ? supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "visits", p_action: "view" })
+        : Promise.resolve({ data: false }),
     ])
 
   const { data: team } = orgId
@@ -96,12 +105,16 @@ export default async function DashboardPage() {
     ? Math.round(teamRows.reduce((sum, r) => sum + r.coverage_pct, 0) / teamRows.length)
     : 0
 
-  const stats = [
-    { label: "HCPs in view", value: hcpCount ?? 0, icon: Stethoscope, accent: "var(--chart-1)" },
-    { label: "Total visits logged", value: visitCount ?? 0, icon: ClipboardList, accent: "var(--chart-2)" },
-    { label: "Visits today", value: todayCount ?? 0, icon: CalendarCheck2, accent: "var(--chart-3)" },
-    { label: "Avg. territory coverage", value: `${avgCoverage}%`, icon: TrendingUp, accent: "var(--chart-4)" },
-  ]
+  // Some roles (HR, Finance, Purchasing, Warehouse, Platform Owner, Guest) have no
+  // hcps/visits permission at all — showing these as misleading always-zero cards
+  // instead of hiding them. Checked dynamically since roles are admin-configurable.
+  type StatItem = { label: string; value: number | string; icon: LucideIcon; accent: string }
+  const stats: StatItem[] = [
+    canViewHcps && { label: "HCPs in view", value: hcpCount ?? 0, icon: Stethoscope, accent: "var(--chart-1)" },
+    canViewVisits && { label: "Total visits logged", value: visitCount ?? 0, icon: ClipboardList, accent: "var(--chart-2)" },
+    canViewVisits && { label: "Visits today", value: todayCount ?? 0, icon: CalendarCheck2, accent: "var(--chart-3)" },
+    teamRows.length > 0 && { label: "Avg. territory coverage", value: `${avgCoverage}%`, icon: TrendingUp, accent: "var(--chart-4)" },
+  ].filter((s): s is StatItem => Boolean(s))
 
   let roleStats: { label: string; value: number | string; icon: LucideIcon }[] = []
 
@@ -118,13 +131,15 @@ export default async function DashboardPage() {
       { label: "Configured roles", value: roleCount ?? 0, icon: KeyRound },
     ]
   } else if (persona === "manager") {
-    const [{ count: pendingPlans }, { count: pendingClaims }] = await Promise.all([
+    // Every manager tier (including Territory Manager, which has no expense_claims
+    // permission) can view leave_requests — unlike expense_claims, this works for all of them.
+    const [{ count: pendingPlans }, { count: pendingLeave }] = await Promise.all([
       supabase.from("tour_plans").select("*", { count: "exact", head: true }).in("status", pendingStatuses),
-      supabase.from("expense_claims").select("*", { count: "exact", head: true }).in("status", pendingStatuses),
+      supabase.from("leave_requests").select("*", { count: "exact", head: true }).in("status", pendingStatuses),
     ])
     roleStats = [
       { label: "Tour plans awaiting approval", value: pendingPlans ?? 0, icon: Map },
-      { label: "Expense claims awaiting approval", value: pendingClaims ?? 0, icon: Receipt },
+      { label: "Leave requests awaiting approval", value: pendingLeave ?? 0, icon: CalendarClock },
     ]
   } else if (persona === "hr") {
     const [{ count: pendingLeave }, { count: pendingReviews }] = await Promise.all([
@@ -144,6 +159,15 @@ export default async function DashboardPage() {
       { label: "Expense claims awaiting approval", value: pendingClaims ?? 0, icon: Receipt },
       { label: "Orders awaiting approval", value: pendingOrders ?? 0, icon: ShoppingCart },
     ]
+  } else if (persona === "purchasing") {
+    const [{ count: pendingOrders }, { count: allocationCount }] = await Promise.all([
+      supabase.from("orders").select("*", { count: "exact", head: true }).in("status", pendingStatuses),
+      supabase.from("sample_allocations").select("*", { count: "exact", head: true }).eq("period_month", periodMonth),
+    ])
+    roleStats = [
+      { label: "Orders awaiting approval", value: pendingOrders ?? 0, icon: ShoppingCart },
+      { label: "Sample allocations this month", value: allocationCount ?? 0, icon: Boxes },
+    ]
   } else if (persona === "warehouse") {
     const { count: allocationCount } = await supabase
       .from("sample_allocations")
@@ -155,6 +179,16 @@ export default async function DashboardPage() {
     roleStats = [
       { label: "AI-recommended visits pending", value: (recommended as unknown[] | null)?.length ?? 0, icon: Sparkles },
     ]
+  }
+
+  // Product Manager and Guest have no hcps/visits access and no dedicated persona
+  // branch above, which would otherwise leave them with a completely empty dashboard
+  // body. Both do have "products" view, so fall back to that.
+  if (roleStats.length === 0 && stats.length === 0) {
+    const { count: productCount } = await supabase.from("products").select("*", { count: "exact", head: true })
+    if (productCount !== null) {
+      roleStats = [{ label: "Products in catalog", value: productCount, icon: Boxes }]
+    }
   }
 
   const accent = PERSONA_ACCENT[persona]
@@ -221,31 +255,33 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      <div>
-        <p className="text-sm font-semibold uppercase tracking-wider text-primary mb-3">Overview</p>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat, i) => (
-            <Card
-              key={stat.label}
-              className="group animate-fade-up"
-              style={{ animationDelay: `${0.05 * i}s` }}
-            >
-              <CardContent className="pt-5 flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
-                  <p className="font-display text-3xl font-bold tracking-tight text-foreground tabular-nums mt-1">{stat.value}</p>
-                </div>
-                <div
-                  className="shrink-0 grid place-items-center size-10 rounded-lg transition-transform duration-200 group-hover:scale-105"
-                  style={{ background: `color-mix(in oklch, ${stat.accent}, transparent 88%)`, color: stat.accent }}
-                >
-                  <stat.icon className="size-5" aria-hidden />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+      {stats.length > 0 && (
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-wider text-primary mb-3">Overview</p>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {stats.map((stat, i) => (
+              <Card
+                key={stat.label}
+                className="group animate-fade-up"
+                style={{ animationDelay: `${0.05 * i}s` }}
+              >
+                <CardContent className="pt-5 flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
+                    <p className="font-display text-3xl font-bold tracking-tight text-foreground tabular-nums mt-1">{stat.value}</p>
+                  </div>
+                  <div
+                    className="shrink-0 grid place-items-center size-10 rounded-lg transition-transform duration-200 group-hover:scale-105"
+                    style={{ background: `color-mix(in oklch, ${stat.accent}, transparent 88%)`, color: stat.accent }}
+                  >
+                    <stat.icon className="size-5" aria-hidden />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {roleStats.length > 0 && (
         <div>
