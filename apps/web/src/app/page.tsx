@@ -10,6 +10,10 @@ import {
   ArrowRight,
   MapPin,
   TrendingUp,
+  FilePlus2,
+  Send,
+  CheckCheck,
+  BarChart3,
 } from "lucide-react"
 import { buttonVariants } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -60,11 +64,26 @@ const stats = [
   { value: "Live", label: "GPS field tracking" },
 ]
 
+const steps = [
+  { icon: FilePlus2, title: "Draft", body: "A rep logs a visit, tour plan, expense, or order from the field — online or off." },
+  { icon: Send, title: "Submit", body: "One tap routes it into the same permission-aware approval engine, every time." },
+  { icon: CheckCheck, title: "Approve", body: "Territory-scoped managers see exactly what they're allowed to — nothing more." },
+  { icon: BarChart3, title: "Analyze", body: "Every decision lands in an immutable audit log, feeding dashboards and AI insight." },
+]
+
+const roles = [
+  "Super Admin", "Platform Owner", "Company Admin", "National Sales Manager",
+  "Zonal Manager", "Regional Manager", "Area Sales Manager", "Territory Manager",
+  "Medical Representative", "Key Account Manager", "Product Manager", "Marketing Manager",
+  "HR", "Finance", "Warehouse Manager", "Purchasing Officer",
+  "Customer Support", "Auditor", "Guest",
+]
+
 export default function HomePage() {
   return (
     <div className="space-y-16 sm:space-y-24 pb-8">
       <section
-        className="relative overflow-hidden rounded-2xl min-h-[520px] sm:min-h-[600px] flex items-center -mt-2"
+        className="relative overflow-hidden rounded-2xl min-h-[540px] sm:min-h-[620px] flex items-center -mt-2"
         style={{
           background:
             "radial-gradient(120% 140% at 12% 0%, #7a2b2b 0%, #602020 32%, #3d1515 62%, #26343a 100%)",
@@ -73,13 +92,13 @@ export default function HomePage() {
         {/* Brand glow accents */}
         <div
           aria-hidden
-          className="absolute -right-32 -top-32 size-[28rem] rounded-full opacity-[0.22] blur-[2px]"
+          className="absolute -right-32 -top-32 size-[28rem] rounded-full opacity-[0.22] blur-[2px] animate-float-slow"
           style={{ background: "radial-gradient(circle, #f8b028 0%, transparent 70%)" }}
         />
         <div
           aria-hidden
-          className="absolute -left-20 bottom-0 size-72 rounded-full opacity-[0.14] blur-[2px]"
-          style={{ background: "radial-gradient(circle, #a4b4b6 0%, transparent 70%)" }}
+          className="absolute -left-20 bottom-0 size-72 rounded-full opacity-[0.14] blur-[2px] animate-float-slow"
+          style={{ background: "radial-gradient(circle, #a4b4b6 0%, transparent 70%)", animationDelay: "-4s" }}
         />
         {/* Subtle dot-grid texture */}
         <div
@@ -97,24 +116,33 @@ export default function HomePage() {
         />
 
         <div className="relative w-full px-6 sm:px-12 py-14 flex flex-col items-start gap-7 max-w-3xl">
-          <div className="bg-white rounded-xl p-3 shadow-[var(--shadow-lg)]">
+          <div className="bg-white rounded-xl p-3 shadow-[var(--shadow-lg)] animate-fade-up">
             <Image src="/zicon-logo.png" alt="Zicon Technology" width={140} height={57} priority />
           </div>
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-white/10 backdrop-blur px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-[#f8b028] ring-1 ring-white/15">
+          <div
+            className="inline-flex items-center gap-1.5 rounded-full bg-white/10 backdrop-blur px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-[#f8b028] ring-1 ring-white/15 animate-fade-up"
+            style={{ animationDelay: "0.05s" }}
+          >
             <Sparkles className="size-3" aria-hidden />
             Field Force Intelligence Platform
           </div>
-          <h1 className="text-4xl sm:text-6xl font-semibold tracking-tight text-white leading-[1.05]">
+          <h1
+            className="text-4xl sm:text-6xl font-semibold tracking-tight text-white leading-[1.05] animate-fade-up"
+            style={{ animationDelay: "0.1s" }}
+          >
             Medical Rep CRM,
             <br />
             built for the field.
           </h1>
-          <p className="text-white/85 text-base sm:text-lg max-w-xl leading-relaxed">
+          <p
+            className="text-white/85 text-base sm:text-lg max-w-xl leading-relaxed animate-fade-up"
+            style={{ animationDelay: "0.15s" }}
+          >
             Territory-aware RBAC, live GPS tracking, deterministic AI intelligence, and a
             single approval engine connecting every workflow — from HCP visits to
             expense claims to secondary sales orders.
           </p>
-          <div className="flex flex-wrap items-center gap-3 pt-1">
+          <div className="flex flex-wrap items-center gap-3 pt-1 animate-fade-up" style={{ animationDelay: "0.2s" }}>
             <Link href="/login" className={buttonVariants({ size: "lg" })}>
               Sign in <ArrowRight className="size-4" aria-hidden />
             </Link>
@@ -127,7 +155,10 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-8 pt-8 w-full border-t border-white/15 mt-2">
+          <div
+            className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-8 pt-8 w-full border-t border-white/15 mt-2 animate-fade-up"
+            style={{ animationDelay: "0.25s" }}
+          >
             {stats.map((s) => (
               <div key={s.label}>
                 <p className="text-2xl sm:text-3xl font-semibold text-white tracking-tight">{s.value}</p>
@@ -163,6 +194,33 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section>
+        <div className="max-w-2xl mb-10">
+          <p className="text-sm font-semibold uppercase tracking-wider text-primary mb-2">Workflow</p>
+          <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">
+            One approval engine, every workflow.
+          </h2>
+        </div>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 relative">
+          <div
+            aria-hidden
+            className="hidden lg:block absolute top-6 left-[12.5%] right-[12.5%] h-px bg-gradient-to-r from-transparent via-border to-transparent"
+          />
+          {steps.map((s, i) => (
+            <div key={s.title} className="relative">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="relative z-10 grid place-items-center size-12 rounded-full bg-primary text-primary-foreground font-semibold shadow-[var(--shadow-md)]">
+                  {i + 1}
+                </div>
+                <s.icon className="size-5 text-muted-foreground" aria-hidden />
+              </div>
+              <h3 className="font-semibold text-foreground mb-1">{s.title}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{s.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <section
         className="relative overflow-hidden rounded-2xl"
         style={{
@@ -183,6 +241,16 @@ export default function HomePage() {
               Super Admin to Medical Representative — every role gets its own permissions,
               territory-scoped visibility, and dashboard, configurable without touching code.
             </p>
+            <div className="flex flex-wrap gap-1.5 mb-7">
+              {roles.map((r) => (
+                <span
+                  key={r}
+                  className="text-xs px-2.5 py-1 rounded-full bg-white/8 text-white/70 ring-1 ring-white/10"
+                >
+                  {r}
+                </span>
+              ))}
+            </div>
             <Link
               href="/login"
               className={buttonVariants({ size: "lg" })}
@@ -228,6 +296,28 @@ export default function HomePage() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section
+        className="relative overflow-hidden rounded-2xl text-center px-6 sm:px-12 py-14"
+        style={{ background: "linear-gradient(135deg, #602020 0%, #4c1a1a 100%)" }}
+      >
+        <div
+          aria-hidden
+          className="absolute left-1/2 -translate-x-1/2 -top-16 size-72 rounded-full opacity-[0.18]"
+          style={{ background: "radial-gradient(circle, #f8b028 0%, transparent 70%)" }}
+        />
+        <div className="relative max-w-xl mx-auto">
+          <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white mb-3">
+            Ready to see your field force in real time?
+          </h2>
+          <p className="text-white/80 text-sm sm:text-base leading-relaxed mb-7">
+            Sign in with any of the 19 demo roles and explore the full platform — no setup required.
+          </p>
+          <Link href="/login" className={buttonVariants({ size: "lg" })}>
+            Sign in <ArrowRight className="size-4" aria-hidden />
+          </Link>
         </div>
       </section>
     </div>
