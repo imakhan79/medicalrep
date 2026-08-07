@@ -26,6 +26,7 @@ import {
   Building2,
   KeyRound,
   Users,
+  History,
   LogOut,
   LogIn,
   type LucideIcon,
@@ -87,6 +88,7 @@ const groups: { label: string; icon: LucideIcon; links: NavLink[] }[] = [
       { href: "/admin/companies", label: "Companies", icon: Building2 },
       { href: "/admin/roles", label: "Roles", icon: KeyRound },
       { href: "/admin/staff", label: "Staff", icon: Users },
+      { href: "/admin/audit-log", label: "Audit Log", icon: History },
     ],
   },
 ]
