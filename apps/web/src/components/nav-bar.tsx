@@ -8,6 +8,7 @@ const links = [
   { href: "/", label: "Dashboard" },
   { href: "/hcps", label: "HCPs" },
   { href: "/visits", label: "Visits" },
+  { href: "/tour-plans", label: "Tour Plans" },
   { href: "/admin/roles", label: "Roles & Permissions" },
   { href: "/admin/staff", label: "Staff" },
 ]

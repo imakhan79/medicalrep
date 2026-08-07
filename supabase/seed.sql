@@ -144,7 +144,7 @@ begin
       ('territory_manager', 'hcos', array['view'], 'territory'),
       ('territory_manager', 'hcps', array['view','create','edit'], 'territory'),
       ('territory_manager', 'visits', array['view'], 'territory'),
-      ('territory_manager', 'tour_plans', array['view','create'], 'territory'),
+      ('territory_manager', 'tour_plans', array['view','create','edit'], 'territory'),
       ('territory_manager', 'targets', array['view'], 'territory'),
       ('territory_manager', 'sample_inventory', array['view','assign'], 'territory'),
       ('territory_manager', 'reports', array['view'], 'territory'),
@@ -302,3 +302,12 @@ insert into public.territory_assignments (organization_id, territory_id, user_id
   ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-0000000000a1'),
   ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-0000000000a2')
 on conflict (territory_id, user_id) do nothing;
+
+insert into public.tour_plans (id, organization_id, rep_id, territory_id, title, period_start, period_end, notes, status) values
+  ('00000000-0000-0000-0000-000000000050', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-0000000000a1',
+   '00000000-0000-0000-0000-000000000010', 'North Zone — Week 32', '2026-08-10', '2026-08-14', 'Focus on cardiology accounts', 'draft')
+on conflict (id) do nothing;
+
+insert into public.tour_plan_visits (id, tour_plan_id, hcp_id, planned_date, notes) values
+  ('00000000-0000-0000-0000-000000000051', '00000000-0000-0000-0000-000000000050', '00000000-0000-0000-0000-000000000030', '2026-08-11', 'Discuss CardioMax 10mg')
+on conflict (id) do nothing;
