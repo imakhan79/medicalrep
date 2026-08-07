@@ -5,7 +5,7 @@
   "start_url": "/",
   "display": "standalone",
   "background_color": "#17140f",
-  "theme_color": "#5c1d1d",
+  "theme_color": "#602020",
   "icons": [
     { "src": "/zicon-logo.png", "sizes": "442x182", "type": "image/png" }
   ]

@@ -75,12 +75,12 @@ export default function LoginPage() {
     <div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_1.4fr] lg:items-start">
       <div
         className="relative overflow-hidden rounded-xl p-8 text-primary-foreground flex flex-col justify-between min-h-[280px]"
-        style={{ background: "linear-gradient(145deg, #5c1d1d 0%, #3d1414 55%, #35474d 130%)" }}
+        style={{ background: "linear-gradient(145deg, #602020 0%, #3d1414 55%, #35474d 130%)" }}
       >
         <div
           aria-hidden
           className="absolute -right-10 -top-10 size-48 rounded-full opacity-20"
-          style={{ background: "#f2a93b" }}
+          style={{ background: "#f8b028" }}
         />
         <div className="relative flex items-center gap-3">
           <div className="bg-white rounded-md p-1.5 shrink-0">

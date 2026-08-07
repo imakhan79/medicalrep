@@ -48,12 +48,12 @@ export default async function DashboardPage() {
     <div className="space-y-6">
       <div
         className="relative overflow-hidden rounded-xl p-6 sm:p-8 text-primary-foreground flex items-center gap-4"
-        style={{ background: "linear-gradient(135deg, #5c1d1d 0%, #3d1414 60%, #35474d 140%)" }}
+        style={{ background: "linear-gradient(135deg, #602020 0%, #3d1414 60%, #35474d 140%)" }}
       >
         <div
           aria-hidden
           className="absolute -right-8 -bottom-12 size-40 rounded-full opacity-20"
-          style={{ background: "#f2a93b" }}
+          style={{ background: "#f8b028" }}
         />
         <div className="bg-white rounded-md p-1.5 shrink-0 relative">
           <Image src="/zicon-logo.png" alt="Zicon Technology" width={88} height={36} />
@@ -67,7 +67,7 @@ export default async function DashboardPage() {
       </div>
       <div className="grid gap-4 sm:grid-cols-3">
         {stats.map((stat) => (
-          <Card key={stat.label} className="border-l-4" style={{ borderLeftColor: "#f2a93b" }}>
+          <Card key={stat.label} className="border-l-4" style={{ borderLeftColor: "#f8b028" }}>
             <CardHeader>
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 {stat.label}

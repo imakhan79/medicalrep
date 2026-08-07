@@ -9,12 +9,13 @@
   --popover: #ffffff;
   --popover-foreground: #1c1917;
 
-  /* Zicon brand: deep maroon primary, steel-blue secondary, amber accent */
-  --primary: #5c1d1d;
+  /* Zicon brand — pixel-sampled from the logo, not estimated:
+     maroon #602020, steel-blue #a4b4b6, amber #f8b028 */
+  --primary: #602020;
   --primary-foreground: #ffffff;
-  --secondary: #e8edf0;
-  --secondary-foreground: #35474d;
-  --accent: #f2a93b;
+  --secondary: #e9eef0;
+  --secondary-foreground: #46595c;
+  --accent: #f8b028;
   --accent-foreground: #3a2405;
 
   --muted: #f0efed;
@@ -25,7 +26,7 @@
 
   --border: #e5e2df;
   --input: #e5e2df;
-  --ring: #5c1d1d;
+  --ring: #602020;
 
   --radius: 0.65rem;
 }
@@ -71,7 +72,7 @@
     --primary-foreground: #211011;
     --secondary: #2c3a3f;
     --secondary-foreground: #cbdbe0;
-    --accent: #f2a93b;
+    --accent: #f8b028;
     --accent-foreground: #2b1a04;
 
     --muted: #2a2521;
