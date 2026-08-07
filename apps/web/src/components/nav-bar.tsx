@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import {
@@ -93,6 +93,7 @@ const groups: { label: string; icon: LucideIcon; links: NavLink[] }[] = [
 
 export function NavBar() {
   const pathname = usePathname()
+  const router = useRouter()
   const [email, setEmail] = useState<string | null>(null)
 
   useEffect(() => {
@@ -107,7 +108,8 @@ export function NavBar() {
   async function handleSignOut() {
     const supabase = createClient()
     await supabase.auth.signOut()
-    window.location.href = "/login"
+    router.push("/login")
+    router.refresh()
   }
 
   const isHome = pathname === "/"

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useSyncExternalStore } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { db } from "@/lib/offline/db"
@@ -13,6 +13,23 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 type Hcp = { id: string; first_name: string; last_name: string }
 type Product = { id: string; name: string }
 
+function subscribeOnlineStatus(callback: () => void) {
+  window.addEventListener("online", callback)
+  window.addEventListener("offline", callback)
+  return () => {
+    window.removeEventListener("online", callback)
+    window.removeEventListener("offline", callback)
+  }
+}
+
+function getOnlineSnapshot() {
+  return navigator.onLine
+}
+
+function getOnlineServerSnapshot() {
+  return true
+}
+
 export function VisitCheckinForm({ hcps, products }: { hcps: Hcp[]; products: Product[] }) {
   const router = useRouter()
   const [hcpId, setHcpId] = useState(hcps[0]?.id ?? "")
@@ -23,23 +40,14 @@ export function VisitCheckinForm({ hcps, products }: { hcps: Hcp[]; products: Pr
   const [submitting, setSubmitting] = useState(false)
   const [status, setStatus] = useState<string | null>(null)
   const [sampleError, setSampleError] = useState<string | null>(null)
-  const [isOnline, setIsOnline] = useState(true)
+  const isOnline = useSyncExternalStore(subscribeOnlineStatus, getOnlineSnapshot, getOnlineServerSnapshot)
 
   useEffect(() => {
-    setIsOnline(navigator.onLine)
     const unregister = registerSyncListeners(() => {
       setStatus("Queued visits synced.")
       router.refresh()
     })
-    const on = () => setIsOnline(true)
-    const off = () => setIsOnline(false)
-    window.addEventListener("online", on)
-    window.addEventListener("offline", off)
-    return () => {
-      unregister()
-      window.removeEventListener("online", on)
-      window.removeEventListener("offline", off)
-    }
+    return unregister
   }, [router])
 
   async function handleSubmit(e: React.FormEvent) {

@@ -153,7 +153,7 @@ export function TrackingControls({ intervalSeconds = 30 }: { intervalSeconds?: n
         </span>
       )}
       <p className="text-xs text-muted-foreground w-full">
-        Tracking runs only while this tab is open and you're checked in — an explicit,
+        Tracking runs only while this tab is open and you&apos;re checked in — an explicit,
         visible session, not silent background surveillance.
       </p>
     </div>

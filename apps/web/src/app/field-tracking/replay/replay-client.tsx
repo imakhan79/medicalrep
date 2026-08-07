@@ -19,7 +19,7 @@ function todayStr() {
   return new Date().toISOString().slice(0, 10)
 }
 
-export function ReplayClient({ orgId, members }: { orgId: string; members: Member[] }) {
+export function ReplayClient({ members }: { members: Member[] }) {
   const [repId, setRepId] = useState(members[0]?.user_id ?? "")
   const [date, setDate] = useState(todayStr())
   const [loading, setLoading] = useState(false)
@@ -102,8 +102,10 @@ export function ReplayClient({ orgId, members }: { orgId: string; members: Membe
     setLoading(false)
   }
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { load() }, [repId, date])
+  useEffect(() => {
+    queueMicrotask(load)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- load closes over repId/date, which are already the deps
+  }, [repId, date])
 
   // Init map once
   useEffect(() => {
@@ -145,7 +147,6 @@ export function ReplayClient({ orgId, members }: { orgId: string; members: Membe
         }
       })
     })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [points])
 
   // Move playback cursor
