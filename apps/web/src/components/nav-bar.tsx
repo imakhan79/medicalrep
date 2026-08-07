@@ -19,6 +19,10 @@ const links = [
   { href: "/anomalies", label: "Anomalies" },
   { href: "/field-tracking", label: "Live Tracking" },
   { href: "/field-tracking/replay", label: "Route Replay" },
+  { href: "/hr/leave", label: "Leave" },
+  { href: "/hr/attendance", label: "Attendance" },
+  { href: "/hr/performance", label: "Performance" },
+  { href: "/admin/companies", label: "Companies" },
   { href: "/admin/roles", label: "Roles & Permissions" },
   { href: "/admin/staff", label: "Staff" },
 ]

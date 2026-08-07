@@ -19,7 +19,9 @@ insert into public.resources (key, name, module) values
   ('orders', 'Orders', 'inventory'),
   ('reports', 'Reports & Dashboards', 'analytics'),
   ('audit_log', 'Audit Log', 'compliance'),
-  ('field_tracking', 'Field Tracking (Live Location & Routes)', 'tracking')
+  ('field_tracking', 'Field Tracking (Live Location & Routes)', 'tracking'),
+  ('leave_requests', 'Leave Requests', 'hr'),
+  ('performance_reviews', 'Performance Reviews', 'hr')
 on conflict (key) do nothing;
 
 -- Full action catalog per resource (the "menu" of what's possible; role_permissions decides what's granted).
@@ -80,6 +82,8 @@ begin
       ('super_admin', 'reports', array['view','export'], 'platform'),
       ('super_admin', 'audit_log', array['view','export'], 'platform'),
       ('super_admin', 'field_tracking', array['view','edit','export','configure'], 'platform'),
+      ('super_admin', 'leave_requests', array['view','approve','reject','export'], 'platform'),
+      ('super_admin', 'performance_reviews', array['view','create','edit'], 'platform'),
 
       ('platform_owner', 'organizations', array['view','create','edit','delete','configure'], 'platform'),
       ('platform_owner', 'roles', array['view','create','edit','delete','configure'], 'platform'),
@@ -87,6 +91,7 @@ begin
       ('platform_owner', 'reports', array['view','export'], 'platform'),
       ('platform_owner', 'audit_log', array['view','export'], 'platform'),
       ('platform_owner', 'field_tracking', array['view','edit','export','configure'], 'platform'),
+      ('platform_owner', 'leave_requests', array['view','approve','reject','export'], 'platform'),
 
       -- Full control within one org
       ('company_admin', 'organizations', array['view','edit'], 'org'),
@@ -106,6 +111,8 @@ begin
       ('company_admin', 'reports', array['view','export'], 'org'),
       ('company_admin', 'audit_log', array['view','export'], 'org'),
       ('company_admin', 'field_tracking', array['view','edit','export','configure'], 'org'),
+      ('company_admin', 'leave_requests', array['view','approve','reject','export','configure'], 'org'),
+      ('company_admin', 'performance_reviews', array['view','create','edit','export'], 'org'),
 
       ('national_sales_manager', 'hcos', array['view'], 'org'),
       ('national_sales_manager', 'hcps', array['view','export'], 'org'),
@@ -116,6 +123,7 @@ begin
       ('national_sales_manager', 'expense_claims', array['view','approve','reject','export'], 'org'),
       ('national_sales_manager', 'reports', array['view','export'], 'org'),
       ('national_sales_manager', 'field_tracking', array['view','edit','export'], 'org'),
+      ('national_sales_manager', 'leave_requests', array['view'], 'org'),
       ('national_sales_manager', 'products', array['view'], 'org'),
       ('national_sales_manager', 'memberships', array['view'], 'org'),
 
@@ -131,6 +139,8 @@ begin
       ('zonal_manager', 'sample_inventory', array['view','assign'], 'hierarchy'),
       ('zonal_manager', 'reports', array['view','export'], 'hierarchy'),
       ('zonal_manager', 'field_tracking', array['view','edit','export'], 'hierarchy'),
+      ('zonal_manager', 'leave_requests', array['view','approve','reject'], 'hierarchy'),
+      ('zonal_manager', 'performance_reviews', array['view','create','edit'], 'hierarchy'),
 
       ('regional_manager', 'hcos', array['view'], 'hierarchy'),
       ('regional_manager', 'hcps', array['view','edit'], 'hierarchy'),
@@ -142,6 +152,8 @@ begin
       ('regional_manager', 'sample_inventory', array['view','assign'], 'hierarchy'),
       ('regional_manager', 'reports', array['view','export'], 'hierarchy'),
       ('regional_manager', 'field_tracking', array['view','edit','export'], 'hierarchy'),
+      ('regional_manager', 'leave_requests', array['view','approve','reject'], 'hierarchy'),
+      ('regional_manager', 'performance_reviews', array['view','create','edit'], 'hierarchy'),
 
       ('area_sales_manager', 'hcos', array['view'], 'hierarchy'),
       ('area_sales_manager', 'hcps', array['view','edit'], 'hierarchy'),
@@ -152,6 +164,8 @@ begin
       ('area_sales_manager', 'reports', array['view'], 'hierarchy'),
       ('area_sales_manager', 'targets', array['view','edit'], 'hierarchy'),
       ('area_sales_manager', 'field_tracking', array['view','edit'], 'hierarchy'),
+      ('area_sales_manager', 'leave_requests', array['view','approve'], 'hierarchy'),
+      ('area_sales_manager', 'performance_reviews', array['view','create','edit'], 'hierarchy'),
 
       ('territory_manager', 'hcos', array['view'], 'territory'),
       ('territory_manager', 'channel_partners', array['view'], 'territory'),
@@ -162,6 +176,8 @@ begin
       ('territory_manager', 'sample_inventory', array['view','assign'], 'territory'),
       ('territory_manager', 'reports', array['view'], 'territory'),
       ('territory_manager', 'field_tracking', array['view','edit'], 'territory'),
+      ('territory_manager', 'leave_requests', array['view','approve'], 'territory'),
+      ('territory_manager', 'performance_reviews', array['view','create','edit'], 'territory'),
 
       -- Individual field roles
       ('medical_representative', 'hcos', array['view'], 'territory'),
@@ -175,6 +191,8 @@ begin
       ('medical_representative', 'targets', array['view'], 'own'),
       ('medical_representative', 'reports', array['view'], 'own'),
       ('medical_representative', 'field_tracking', array['view','create','edit'], 'own'),
+      ('medical_representative', 'leave_requests', array['view','create','edit'], 'own'),
+      ('medical_representative', 'performance_reviews', array['view','edit'], 'own'),
 
       ('key_account_manager', 'hcos', array['view','edit'], 'territory'),
       ('key_account_manager', 'hcps', array['view','edit'], 'territory'),
@@ -187,6 +205,8 @@ begin
       ('key_account_manager', 'targets', array['view'], 'own'),
       ('key_account_manager', 'reports', array['view'], 'own'),
       ('key_account_manager', 'field_tracking', array['view','create','edit'], 'own'),
+      ('key_account_manager', 'leave_requests', array['view','create','edit'], 'own'),
+      ('key_account_manager', 'performance_reviews', array['view','edit'], 'own'),
 
       -- Functional / back-office roles
       ('product_manager', 'products', array['view','create','edit','delete','configure'], 'org'),
@@ -202,6 +222,9 @@ begin
       ('hr', 'memberships', array['view','create','edit','delete','assign'], 'org'),
       ('hr', 'roles', array['view'], 'org'),
       ('hr', 'reports', array['view','export'], 'org'),
+      ('hr', 'field_tracking', array['view','export'], 'org'),
+      ('hr', 'leave_requests', array['view','approve','reject','export'], 'org'),
+      ('hr', 'performance_reviews', array['view','create','edit','export'], 'org'),
 
       ('finance', 'expense_claims', array['view','approve','reject','export'], 'org'),
       ('finance', 'orders', array['view','approve','reject','export'], 'org'),
@@ -235,6 +258,8 @@ begin
       ('auditor', 'reports', array['view','export'], 'org'),
       ('auditor', 'audit_log', array['view','export'], 'org'),
       ('auditor', 'field_tracking', array['view','export'], 'org'),
+      ('auditor', 'leave_requests', array['view','export'], 'org'),
+      ('auditor', 'performance_reviews', array['view','export'], 'org'),
 
       ('guest', 'hcos', array['view'], 'org'),
       ('guest', 'products', array['view'], 'org')
