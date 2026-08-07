@@ -18,6 +18,7 @@ const links = [
   { href: "/territory-optimization", label: "Territory Optimization" },
   { href: "/anomalies", label: "Anomalies" },
   { href: "/field-tracking", label: "Live Tracking" },
+  { href: "/field-tracking/replay", label: "Route Replay" },
   { href: "/admin/roles", label: "Roles & Permissions" },
   { href: "/admin/staff", label: "Staff" },
 ]
