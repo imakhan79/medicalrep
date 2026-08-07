@@ -8,36 +8,76 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
+const DEMO_PASSWORD = "DevPassword123!"
+
+const DEMO_ACCOUNTS = [
+  { role: "Super Admin", email: "superadmin@medicalrep.dev" },
+  { role: "Platform Owner", email: "platformowner@medicalrep.dev" },
+  { role: "Company Admin", email: "admin1@medicalrep.dev" },
+  { role: "National Sales Manager", email: "nationalmanager@medicalrep.dev" },
+  { role: "Zonal Manager", email: "zonalmanager@medicalrep.dev" },
+  { role: "Regional Manager", email: "manager1@medicalrep.dev" },
+  { role: "Area Sales Manager", email: "areamanager@medicalrep.dev" },
+  { role: "Territory Manager", email: "territorymanager@medicalrep.dev" },
+  { role: "Medical Representative", email: "rep1@medicalrep.dev" },
+  { role: "Key Account Manager", email: "kam@medicalrep.dev" },
+  { role: "Product Manager", email: "productmanager@medicalrep.dev" },
+  { role: "Marketing Manager", email: "marketingmanager@medicalrep.dev" },
+  { role: "HR", email: "hr@medicalrep.dev" },
+  { role: "Finance", email: "finance@medicalrep.dev" },
+  { role: "Warehouse Manager", email: "warehouse@medicalrep.dev" },
+  { role: "Purchasing Officer", email: "purchasing@medicalrep.dev" },
+  { role: "Customer Support", email: "support@medicalrep.dev" },
+  { role: "Auditor", email: "auditor@medicalrep.dev" },
+  { role: "Guest", email: "guest@medicalrep.dev" },
+]
+
 export default function LoginPage() {
   const router = useRouter()
   const [email, setEmail] = useState("rep1@medicalrep.dev")
-  const [password, setPassword] = useState("DevPassword123!")
+  const [password, setPassword] = useState(DEMO_PASSWORD)
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [demoLoadingEmail, setDemoLoadingEmail] = useState<string | null>(null)
+
+  async function signIn(signInEmail: string, signInPassword: string) {
+    const supabase = createClient()
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: signInEmail,
+      password: signInPassword,
+    })
+    if (signInError) {
+      setError(signInError.message)
+      return false
+    }
+    router.push("/")
+    router.refresh()
+    return true
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setSubmitting(true)
     setError(null)
-    const supabase = createClient()
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+    await signIn(email, password)
     setSubmitting(false)
-    if (signInError) {
-      setError(signInError.message)
-      return
-    }
-    router.push("/")
-    router.refresh()
+  }
+
+  async function handleDemoLogin(demoEmail: string) {
+    setError(null)
+    setDemoLoadingEmail(demoEmail)
+    await signIn(demoEmail, DEMO_PASSWORD)
+    setDemoLoadingEmail(null)
   }
 
   return (
-    <div className="max-w-sm mx-auto mt-12">
+    <div className="max-w-3xl mx-auto mt-12 space-y-6">
       <Card>
         <CardHeader>
           <CardTitle>Sign in</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="grid gap-4">
+          <form onSubmit={handleSubmit} className="grid gap-4 max-w-sm">
             <div className="grid gap-1.5">
               <Label htmlFor="email">Email</Label>
               <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
@@ -54,10 +94,33 @@ export default function LoginPage() {
                 {error}
               </p>
             )}
-            <p className="text-xs text-muted-foreground">
-              Dev users: rep1@medicalrep.dev / manager1@medicalrep.dev, password DevPassword123!
-            </p>
           </form>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Quick demo login</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            One click per role — dev-only accounts, all password {DEMO_PASSWORD}.
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {DEMO_ACCOUNTS.map((account) => (
+              <Button
+                key={account.email}
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={demoLoadingEmail !== null}
+                onClick={() => handleDemoLogin(account.email)}
+                className="justify-start"
+              >
+                {demoLoadingEmail === account.email ? "Signing in…" : account.role}
+              </Button>
+            ))}
+          </div>
         </CardContent>
       </Card>
     </div>

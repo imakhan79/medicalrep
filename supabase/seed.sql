@@ -574,3 +574,75 @@ insert into public.geofences (id, organization_id, entity_type, entity_id, name,
   ('00000000-0000-0000-0000-0000000000d2', '00000000-0000-0000-0000-000000000001', 'hco', '00000000-0000-0000-0000-000000000021', 'Riverside Clinic', 40.7489, -73.9680, 150, '00000000-0000-0000-0000-000000000010'),
   ('00000000-0000-0000-0000-0000000000d3', '00000000-0000-0000-0000-000000000001', 'hco', '00000000-0000-0000-0000-000000000022', 'Southside Medical Center', 40.6892, -74.0445, 250, '00000000-0000-0000-0000-000000000011')
 on conflict (id) do nothing;
+
+-- ══════════════════════════════════════════════════════════════════════════
+-- One demo account per system role, all password DevPassword123! (dev-only),
+-- so the login page can offer one-click demo access to every role.
+-- ══════════════════════════════════════════════════════════════════════════
+
+insert into auth.users (
+  instance_id, id, aud, role, email, encrypted_password,
+  email_confirmed_at, created_at, updated_at,
+  confirmation_token, recovery_token, email_change_token_new, email_change,
+  raw_app_meta_data, raw_user_meta_data
+) values
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-0000000000e1', 'authenticated', 'authenticated', 'superadmin@medicalrep.dev', crypt('DevPassword123!', gen_salt('bf')), now(), now(), now(), '', '', '', '', '{"provider":"email","providers":["email"]}', '{}'),
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-0000000000e2', 'authenticated', 'authenticated', 'platformowner@medicalrep.dev', crypt('DevPassword123!', gen_salt('bf')), now(), now(), now(), '', '', '', '', '{"provider":"email","providers":["email"]}', '{}'),
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-0000000000e3', 'authenticated', 'authenticated', 'nationalmanager@medicalrep.dev', crypt('DevPassword123!', gen_salt('bf')), now(), now(), now(), '', '', '', '', '{"provider":"email","providers":["email"]}', '{}'),
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-0000000000e4', 'authenticated', 'authenticated', 'zonalmanager@medicalrep.dev', crypt('DevPassword123!', gen_salt('bf')), now(), now(), now(), '', '', '', '', '{"provider":"email","providers":["email"]}', '{}'),
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-0000000000e5', 'authenticated', 'authenticated', 'areamanager@medicalrep.dev', crypt('DevPassword123!', gen_salt('bf')), now(), now(), now(), '', '', '', '', '{"provider":"email","providers":["email"]}', '{}'),
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-0000000000e6', 'authenticated', 'authenticated', 'territorymanager@medicalrep.dev', crypt('DevPassword123!', gen_salt('bf')), now(), now(), now(), '', '', '', '', '{"provider":"email","providers":["email"]}', '{}'),
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-0000000000e7', 'authenticated', 'authenticated', 'kam@medicalrep.dev', crypt('DevPassword123!', gen_salt('bf')), now(), now(), now(), '', '', '', '', '{"provider":"email","providers":["email"]}', '{}'),
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-0000000000e8', 'authenticated', 'authenticated', 'productmanager@medicalrep.dev', crypt('DevPassword123!', gen_salt('bf')), now(), now(), now(), '', '', '', '', '{"provider":"email","providers":["email"]}', '{}'),
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-0000000000e9', 'authenticated', 'authenticated', 'marketingmanager@medicalrep.dev', crypt('DevPassword123!', gen_salt('bf')), now(), now(), now(), '', '', '', '', '{"provider":"email","providers":["email"]}', '{}'),
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-0000000000ea', 'authenticated', 'authenticated', 'hr@medicalrep.dev', crypt('DevPassword123!', gen_salt('bf')), now(), now(), now(), '', '', '', '', '{"provider":"email","providers":["email"]}', '{}'),
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-0000000000eb', 'authenticated', 'authenticated', 'finance@medicalrep.dev', crypt('DevPassword123!', gen_salt('bf')), now(), now(), now(), '', '', '', '', '{"provider":"email","providers":["email"]}', '{}'),
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-0000000000ec', 'authenticated', 'authenticated', 'warehouse@medicalrep.dev', crypt('DevPassword123!', gen_salt('bf')), now(), now(), now(), '', '', '', '', '{"provider":"email","providers":["email"]}', '{}'),
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-0000000000ed', 'authenticated', 'authenticated', 'purchasing@medicalrep.dev', crypt('DevPassword123!', gen_salt('bf')), now(), now(), now(), '', '', '', '', '{"provider":"email","providers":["email"]}', '{}'),
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-0000000000ee', 'authenticated', 'authenticated', 'support@medicalrep.dev', crypt('DevPassword123!', gen_salt('bf')), now(), now(), now(), '', '', '', '', '{"provider":"email","providers":["email"]}', '{}'),
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-0000000000ef', 'authenticated', 'authenticated', 'auditor@medicalrep.dev', crypt('DevPassword123!', gen_salt('bf')), now(), now(), now(), '', '', '', '', '{"provider":"email","providers":["email"]}', '{}'),
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-0000000000f0', 'authenticated', 'authenticated', 'guest@medicalrep.dev', crypt('DevPassword123!', gen_salt('bf')), now(), now(), now(), '', '', '', '', '{"provider":"email","providers":["email"]}', '{}')
+on conflict (id) do nothing;
+
+insert into auth.identities (id, provider_id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
+select id, id, id, jsonb_build_object('sub', id::text, 'email', email), 'email', now(), now(), now()
+from auth.users
+where id in (
+  '00000000-0000-0000-0000-0000000000e1','00000000-0000-0000-0000-0000000000e2','00000000-0000-0000-0000-0000000000e3',
+  '00000000-0000-0000-0000-0000000000e4','00000000-0000-0000-0000-0000000000e5','00000000-0000-0000-0000-0000000000e6',
+  '00000000-0000-0000-0000-0000000000e7','00000000-0000-0000-0000-0000000000e8','00000000-0000-0000-0000-0000000000e9',
+  '00000000-0000-0000-0000-0000000000ea','00000000-0000-0000-0000-0000000000eb','00000000-0000-0000-0000-0000000000ec',
+  '00000000-0000-0000-0000-0000000000ed','00000000-0000-0000-0000-0000000000ee','00000000-0000-0000-0000-0000000000ef',
+  '00000000-0000-0000-0000-0000000000f0'
+)
+on conflict (provider_id, provider) do nothing;
+
+insert into public.memberships (organization_id, user_id, role_id)
+select '00000000-0000-0000-0000-000000000001', v.user_id, r.id
+from (values
+  ('00000000-0000-0000-0000-0000000000e1'::uuid, 'super_admin'),
+  ('00000000-0000-0000-0000-0000000000e2'::uuid, 'platform_owner'),
+  ('00000000-0000-0000-0000-0000000000e3'::uuid, 'national_sales_manager'),
+  ('00000000-0000-0000-0000-0000000000e4'::uuid, 'zonal_manager'),
+  ('00000000-0000-0000-0000-0000000000e5'::uuid, 'area_sales_manager'),
+  ('00000000-0000-0000-0000-0000000000e6'::uuid, 'territory_manager'),
+  ('00000000-0000-0000-0000-0000000000e7'::uuid, 'key_account_manager'),
+  ('00000000-0000-0000-0000-0000000000e8'::uuid, 'product_manager'),
+  ('00000000-0000-0000-0000-0000000000e9'::uuid, 'marketing_manager'),
+  ('00000000-0000-0000-0000-0000000000ea'::uuid, 'hr'),
+  ('00000000-0000-0000-0000-0000000000eb'::uuid, 'finance'),
+  ('00000000-0000-0000-0000-0000000000ec'::uuid, 'warehouse_manager'),
+  ('00000000-0000-0000-0000-0000000000ed'::uuid, 'purchasing_officer'),
+  ('00000000-0000-0000-0000-0000000000ee'::uuid, 'customer_support'),
+  ('00000000-0000-0000-0000-0000000000ef'::uuid, 'auditor'),
+  ('00000000-0000-0000-0000-0000000000f0'::uuid, 'guest')
+) as v(user_id, role_key)
+join public.roles r on r.key = v.role_key and r.organization_id is null
+on conflict (user_id, organization_id) do update set role_id = excluded.role_id;
+
+insert into public.territory_assignments (organization_id, territory_id, user_id) values
+  ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-0000000000e4'),
+  ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-0000000000e5'),
+  ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-0000000000e6'),
+  ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-0000000000e7')
+on conflict (territory_id, user_id) do nothing;
