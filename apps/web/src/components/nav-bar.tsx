@@ -9,6 +9,7 @@ const links = [
   { href: "/hcps", label: "HCPs" },
   { href: "/visits", label: "Visits" },
   { href: "/admin/roles", label: "Roles & Permissions" },
+  { href: "/admin/staff", label: "Staff" },
 ]
 
 export function NavBar() {
