@@ -51,27 +51,25 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="relative overflow-hidden rounded-2xl min-h-[300px] sm:min-h-[340px] flex flex-col justify-between text-primary-foreground">
-        <Image
-          src="/images/hero-healthcare.jpg"
-          alt=""
-          fill
-          priority
-          sizes="(max-width: 768px) 100vw, 1152px"
-          className="object-cover object-[center_18%]"
+      <div
+        className="relative overflow-hidden rounded-2xl min-h-[300px] sm:min-h-[340px] flex flex-col justify-between text-primary-foreground animate-fade-up"
+        style={{
+          background:
+            "radial-gradient(120% 140% at 12% 0%, #7a2b2b 0%, #602020 32%, #3d1515 62%, #26343a 100%)",
+        }}
+      >
+        <div
+          aria-hidden
+          className="absolute -right-20 -top-20 size-72 rounded-full opacity-[0.2] blur-[1px] animate-float-slow"
+          style={{ background: "radial-gradient(circle, #f8b028 0%, transparent 70%)" }}
         />
         <div
           aria-hidden
-          className="absolute inset-0"
+          className="absolute inset-0 opacity-[0.15]"
           style={{
-            background:
-              "linear-gradient(120deg, #602020 8%, rgba(61,20,20,0.95) 38%, rgba(53,71,77,0.6) 78%, rgba(53,71,77,0.35) 100%)",
+            backgroundImage: "radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px)",
+            backgroundSize: "28px 28px",
           }}
-        />
-        <div
-          aria-hidden
-          className="absolute -right-20 -top-20 size-72 rounded-full opacity-[0.18] blur-[1px]"
-          style={{ background: "#f8b028" }}
         />
         <div
           aria-hidden
