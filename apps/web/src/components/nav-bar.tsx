@@ -27,6 +27,8 @@ import {
   KeyRound,
   Users,
   History,
+  MapPinned,
+  Settings,
   LogOut,
   LogIn,
   type LucideIcon,
@@ -70,6 +72,8 @@ const groups: { label: string; icon: LucideIcon; links: NavLink[] }[] = [
     links: [
       { href: "/field-tracking", label: "Live Map", icon: Radar },
       { href: "/field-tracking/replay", label: "Route Replay", icon: Route },
+      { href: "/field-tracking/geofences", label: "Geofences", icon: MapPinned },
+      { href: "/field-tracking/settings", label: "Tracking Settings", icon: Settings },
     ],
   },
   {

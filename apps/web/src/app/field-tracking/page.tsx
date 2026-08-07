@@ -16,7 +16,7 @@ export default async function FieldTrackingPage() {
     return <p className="text-muted-foreground text-sm">Sign in with an organization membership.</p>
   }
 
-  const [{ data: canCreate }, { data: canEdit }, { data: locations }, { data: members }, { data: geofences }, { data: alerts }, { data: sosIncidents }] =
+  const [{ data: canCreate }, { data: canEdit }, { data: locations }, { data: members }, { data: geofences }, { data: alerts }, { data: sosIncidents }, { data: policy }] =
     await Promise.all([
       supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "field_tracking", p_action: "create" }),
       supabase.rpc("can_access_row", { p_org_id: orgId, p_resource_key: "field_tracking", p_action: "edit" }),
@@ -35,6 +35,7 @@ export default async function FieldTrackingPage() {
         .in("status", ["open", "acknowledged"])
         .order("triggered_at", { ascending: false })
         .limit(20),
+      supabase.from("tracking_policies").select("tracking_interval_seconds").eq("organization_id", orgId).maybeSingle(),
     ])
 
   const repEmails = Object.fromEntries(
@@ -49,7 +50,7 @@ export default async function FieldTrackingPage() {
         subtitle="Real-time GPS, geofenced visit detection, and alerts — scoped to your role and territory."
       />
 
-      {canCreate && <TrackingControls />}
+      {canCreate && <TrackingControls intervalSeconds={policy?.tracking_interval_seconds ?? 30} />}
 
       <Card className="border-destructive/30">
         <CardHeader>
